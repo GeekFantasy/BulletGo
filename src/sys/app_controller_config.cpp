@@ -14,6 +14,7 @@ void AppController::read_config(SysUtilConfig *cfg)
     char info[128] = {0};
     uint16_t size = g_flashCfg.readFile(APP_CTRL_CONFIG_PATH, (uint8_t *)info);
     info[size] = 0;
+    
     if (size == 0)
     {
         // 默认值

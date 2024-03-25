@@ -709,7 +709,5 @@ lv_font_t digifacewide = {
     .user_data = NULL,
 };
 
-
-
 #endif /*#if DIGIFACEWIDE*/
 

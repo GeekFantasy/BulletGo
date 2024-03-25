@@ -146,7 +146,8 @@ static int bullet_counter_init(AppController *sys)
 static void bullet_counter_process(AppController *sys,
                             const ImuAction *act_info)
 {
-    display_bullet_status();
+
+    display_bullet_status(bullet_sensor.getNum(), bullet_sensor.isLoaded());
     // lv_scr_load_anim_t anim_type = LV_SCR_LOAD_ANIM_NONE;
 
     // if (RETURN == act_info->active)
