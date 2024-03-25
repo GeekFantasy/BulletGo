@@ -101,39 +101,18 @@ void setup()
 #if APP_WEATHER_USE
     app_controller->app_install(&weather_app);
 #endif
-#if APP_WEATHER_OLD_USE
-    app_controller->app_install(&weather_old_app);
-#endif
-#if APP_PICTURE_USE
-    app_controller->app_install(&picture_app);
-#endif
-#if APP_MEDIA_PLAYER_USE
-    app_controller->app_install(&media_app);
-#endif
-#if APP_SCREEN_SHARE_USE
-    app_controller->app_install(&screen_share_app);
-#endif
-#if APP_FILE_MANAGER_USE
-    app_controller->app_install(&file_manager_app);
-#endif
 
     app_controller->app_install(&server_app);
 
 #if APP_IDEA_ANIM_USE
     app_controller->app_install(&idea_app);
 #endif
-#if APP_BILIBILI_FANS_USE
-    app_controller->app_install(&bilibili_app);
-#endif
+
 #if APP_SETTING_USE
     app_controller->app_install(&settings_app);
 #endif
 #if APP_GAME_2048_USE
     app_controller->app_install(&game_2048_app);
-#endif
-
-#if APP_HEARTBEAT_USE
-    app_controller->app_install(&heartbeat_app, APP_TYPE_BACKGROUND);
 #endif
 
     // 自启动APP
@@ -153,7 +132,6 @@ void setup()
     pinMode(BTNPIN, INPUT);
 
     // 初始化Sensor
-    //Wire1.begin(13, 15, 100000);
     bullet_sensor.init();
 
     // 先初始化一次动作数据 防空指针
