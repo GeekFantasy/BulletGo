@@ -10,6 +10,7 @@ extern "C" {
 extern const lv_img_dsc_t app_bullet_counter;
 
 void bullet_counter_gui_init();
+void bullet_counter_gui_del(void);
 void display_bullet_status(int bullet_cnt, bool is_loaded);
 
 #ifdef __cplusplus

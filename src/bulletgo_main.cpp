@@ -17,7 +17,6 @@
 #include <esp32-hal.h>
 #include <esp32-hal-timer.h>
 
-#define BTNPIN 35
 
 static bool isCheckAction = false;
 
@@ -119,7 +118,7 @@ void setup()
     app_controller->app_auto_start();
 
     // 优先显示屏幕 加快视觉上的开机时间
-    app_controller->main_process(&mpu.action_info);
+    app_controller->main_process(&mpu.action_info, ButtonEvent::NONE);
 
     /*** Init IMU as input device ***/
     // lv_port_indev_init();
@@ -129,7 +128,7 @@ void setup()
              &app_controller->mpu_cfg); // 初始化比较耗时
 
     // 初始化按钮
-    pinMode(BTNPIN, INPUT);
+    button.init();
 
     // 初始化Sensor
     bullet_sensor.init();
@@ -152,21 +151,14 @@ void loop()
         isCheckAction = false;
         act_info = mpu.getAction();
     }
-    app_controller->main_process(act_info); // 运行当前进程
+    ButtonEvent event = button.getEvent();
+    app_controller->main_process(act_info, event); // 运行当前进程
 
     Serial.printf("Time: %d \n", GET_SYS_MILLIS());
 
     //Read button state
-    int pinState = digitalRead(BTNPIN);
-    if(pinState == HIGH)
-    {
-        Serial.println("Button pushed!!!");
-    }
-    else
-    {
-        Serial.println("Button not pushed.");
-    }
-
+    Serial.printf("Button State: %d, Event: %d \n", button.getState(), event);
+    
     Serial.printf("Bullet Sensor, bullet count: %d\n", bullet_sensor.getNum());
     Serial.printf("Bullet Sensor, is loaded: %s\n", bullet_sensor.isLoaded()?"true":"false");
 }

@@ -3,6 +3,7 @@
 
 IMU mpu;
 BulletSensor bullet_sensor;
+Button button;
 SdCard tf;
 Pixel rgb;
 // Config g_cfg;       // 全局配置文件

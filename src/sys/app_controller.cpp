@@ -135,7 +135,7 @@ int AppController::app_auto_start()
     return 0;
 }
 
-int AppController::main_process(ImuAction *act_info)
+int AppController::main_process(ImuAction *act_info, ButtonEvent btn_event)
 {
     if (ACTIVE_TYPE::UNKNOWN != act_info->active)
     {
@@ -176,16 +176,17 @@ int AppController::main_process(ImuAction *act_info)
             cur_app_index = (cur_app_index - 1 + app_num) % app_num; // 此处的3与p_processList的长度一致
             Serial.println(String("Current App: ") + appList[cur_app_index]->app_name);
         }
-        else if (ACTIVE_TYPE::GO_FORWORD == act_info->active)
+        else if ((ACTIVE_TYPE::GO_FORWORD == act_info->active) || ( ButtonEvent::BTN_DOWN == btn_event))
         {
             app_exit_flag = 1; // 进入app
             if (NULL != appList[cur_app_index]->app_init)
             {
                 (*(appList[cur_app_index]->app_init))(this); // 执行APP初始化
             }
+            Serial.println(String("Entering App: ") + appList[cur_app_index]->app_name);
         }
 
-        if (ACTIVE_TYPE::GO_FORWORD != act_info->active) // && UNKNOWN != act_info->active
+        if ((ACTIVE_TYPE::GO_FORWORD != act_info->active) && (ButtonEvent::BTN_DOWN != btn_event))// && UNKNOWN != act_info->active
         {
             app_control_display_scr(appList[cur_app_index]->app_image,
                                     appList[cur_app_index]->app_name,
@@ -195,11 +196,12 @@ int AppController::main_process(ImuAction *act_info)
     }
     else
     {
+        Serial.printf("Handle control to APP: %s \n", appList[cur_app_index]->app_name);
         app_control_display_scr(appList[cur_app_index]->app_image,
                                 appList[cur_app_index]->app_name,
                                 LV_SCR_LOAD_ANIM_NONE, false);
         // 运行APP进程 等效于把控制权交给当前APP
-        (*(appList[cur_app_index]->main_process))(this, act_info);
+        (*(appList[cur_app_index]->main_process))(this, act_info, btn_event);
     }
     act_info->active = ACTIVE_TYPE::UNKNOWN;
     act_info->isValid = 0;

@@ -73,7 +73,8 @@ static int idea_init(AppController *sys)
 }
 
 static void idea_process(AppController *sys,
-                         const ImuAction *action)
+                         const ImuAction *action,
+                         int btn_event)
 {
     lv_scr_load_anim_t anim_type = LV_SCR_LOAD_ANIM_NONE;
 

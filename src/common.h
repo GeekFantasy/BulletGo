@@ -13,6 +13,7 @@
 #include "driver/ambient.h"
 #include "driver/imu.h"
 #include "driver/bullet_sensor.h"
+#include "driver/button.h"
 #include "network.h"
 
 // RGB
@@ -30,6 +31,7 @@
 
 extern IMU mpu; // 原则上只提供给主程序调用
 extern BulletSensor bullet_sensor;
+extern Button button;
 extern SdCard tf;
 extern Pixel rgb;
 // extern Config g_cfg;       // 全局配置文件

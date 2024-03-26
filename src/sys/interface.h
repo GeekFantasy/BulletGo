@@ -44,7 +44,8 @@ struct APP_OBJ
 
     // APP的主程序函数入口指针
     void (*main_process)(AppController *sys,
-                         const ImuAction *act_info);
+                         const ImuAction *act_info,
+                         int btn_event);
 
     // APP的任务的入口指针（一般一分钟内会调用一次）
     void (*background_task)(AppController *sys,

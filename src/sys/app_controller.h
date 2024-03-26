@@ -48,7 +48,7 @@ public:
     int app_uninstall(const APP_OBJ *app);
     // 将APP的后台任务从任务队列中移除(自能通过APP退出的时候，移除自身的后台任务)
     int remove_backgroud_task(void);
-    int main_process(ImuAction *act_info);
+    int main_process(ImuAction *act_info, ButtonEvent btn_event);
     void app_exit(void); // 提供给app退出的系统调用
     // 消息发送
     int send_to(const char *from, const char *to,

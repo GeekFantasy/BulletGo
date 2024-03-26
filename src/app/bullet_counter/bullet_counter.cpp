@@ -144,9 +144,17 @@ static int bullet_counter_init(AppController *sys)
 }
 
 static void bullet_counter_process(AppController *sys,
-                            const ImuAction *act_info)
+                            const ImuAction *act_info,
+                            int btn_event)
 {
+    if(0 == btn_event)
+    {
+        Serial.printf("Will exit the app. \n");
+        sys->app_exit(); // 退出APP
+        return;
+    }
 
+    Serial.printf("Display bullet status. \n");
     display_bullet_status(bullet_sensor.getNum(), bullet_sensor.isLoaded());
     // lv_scr_load_anim_t anim_type = LV_SCR_LOAD_ANIM_NONE;
 
@@ -217,7 +225,7 @@ static void bullet_counter_background_task(AppController *sys,
 
 static int bullet_counter_exit_callback(void *param)
 {
-    //weather_gui_del();
+    bullet_counter_gui_del();
 
     // // 查杀异步任务
     // if (run_data->xReturned_task_task_update == pdPASS)

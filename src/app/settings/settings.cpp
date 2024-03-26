@@ -163,7 +163,8 @@ static int settings_init(AppController *sys)
 }
 
 static void settings_process(AppController *sys,
-                             const ImuAction *act_info)
+                             const ImuAction *act_info,
+                             int btn_event)
 {
     if (RETURN == act_info->active)
     {

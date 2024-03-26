@@ -305,7 +305,8 @@ static int weather_init(AppController *sys)
 }
 
 static void weather_process(AppController *sys,
-                            const ImuAction *act_info)
+                            const ImuAction *act_info,
+                            int btn_event)
 {
     lv_scr_load_anim_t anim_type = LV_SCR_LOAD_ANIM_NONE;
 

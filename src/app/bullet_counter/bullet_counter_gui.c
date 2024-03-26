@@ -22,6 +22,11 @@ void bullet_counter_gui_init()
 
 void bullet_counter_gui_release(void)
 {
+    if(scr_counter != NULL)
+    {
+        lv_obj_clean(scr_counter);
+        scr_counter = NULL;
+    }
     // if (scr_1 != NULL)
     // {
     //     lv_obj_clean(scr_1);
@@ -71,6 +76,8 @@ void display_bullet_status(int bullet_cnt, bool is_loaded)
 {
     scr_counter = lv_scr_act();
     lv_obj_clean(scr_counter);
+
+    //scr_counter  = lv_obj_create(NULL);
 
     lv_obj_t * label_counter = lv_label_create(scr_counter);
     lv_obj_t * cont_bullets = lv_obj_create(scr_counter);
