@@ -101,7 +101,7 @@ void setup()
     app_controller->app_install(&weather_app);
 #endif
 
-    app_controller->app_install(&server_app);
+    //app_controller->app_install(&server_app);
 
 #if APP_IDEA_ANIM_USE
     app_controller->app_install(&idea_app);
@@ -115,7 +115,7 @@ void setup()
 #endif
 
     // 自启动APP
-    //app_controller->app_auto_start();
+    app_controller->app_auto_start();
 
     // 优先显示屏幕 加快视觉上的开机时间
     app_controller->main_process(&mpu.action_info, ButtonEvent::NONE);

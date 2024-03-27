@@ -282,125 +282,125 @@ static void bullet_counter_message_handle(const char *from, const char *to,
                                    APP_MESSAGE_TYPE type, void *message,
                                    void *ext_info)
 {
-    switch (type)
-    {
-    case APP_MESSAGE_WIFI_CONN:
-    {
-        Serial.println(F("----->weather_event_notification"));
-        int event_id = (int)message;
-        switch (event_id)
-        {
-        case UPDATE_NOW:
-        {
-            Serial.print(F("weather update.\n"));
-            run_data->update_type |= UPDATE_WEATHER;
+    // switch (type)
+    // {
+    // case APP_MESSAGE_WIFI_CONN:
+    // {
+    //     Serial.println(F("----->weather_event_notification"));
+    //     int event_id = (int)message;
+    //     switch (event_id)
+    //     {
+    //     case UPDATE_NOW:
+    //     {
+    //         Serial.print(F("weather update.\n"));
+    //         run_data->update_type |= UPDATE_WEATHER;
 
-            //get_weather();
-            if (run_data->clock_page == 0)
-            {
-                //display_weather(run_data->wea, LV_SCR_LOAD_ANIM_NONE);
-            }
-        };
-        break;
-        case UPDATE_NTP:
-        {
-            Serial.print(F("ntp update.\n"));
-            run_data->update_type |= UPDATE_TIME;
+    //         //get_weather();
+    //         if (run_data->clock_page == 0)
+    //         {
+    //             //display_weather(run_data->wea, LV_SCR_LOAD_ANIM_NONE);
+    //         }
+    //     };
+    //     break;
+    //     case UPDATE_NTP:
+    //     {
+    //         Serial.print(F("ntp update.\n"));
+    //         run_data->update_type |= UPDATE_TIME;
 
-            //long long timestamp = get_timestamp(TIME_API); // nowapi时间API
-            if (run_data->clock_page == 0)
-            {
-                //UpdateTime_RTC(timestamp);
-            }
-        };
-        break;
-        case UPDATE_DAILY:
-        {
-            Serial.print(F("daliy update.\n"));
-            run_data->update_type |= UPDATE_DALIY_WEATHER;
+    //         //long long timestamp = get_timestamp(TIME_API); // nowapi时间API
+    //         if (run_data->clock_page == 0)
+    //         {
+    //             //UpdateTime_RTC(timestamp);
+    //         }
+    //     };
+    //     break;
+    //     case UPDATE_DAILY:
+    //     {
+    //         Serial.print(F("daliy update.\n"));
+    //         run_data->update_type |= UPDATE_DALIY_WEATHER;
 
-            //get_daliyWeather(run_data->wea.daily_max, run_data->wea.daily_min);
-            if (run_data->clock_page == 1)
-            {
-                //display_curve(run_data->wea.daily_max, run_data->wea.daily_min, LV_SCR_LOAD_ANIM_NONE);
-            }
-        };
-        break;
-        default:
-            break;
-        }
-    }
-    break;
-    case APP_MESSAGE_GET_PARAM:
-    {
-        char *param_key = (char *)message;
-        if (!strcmp(param_key, "tianqi_appid"))
-        {
-            snprintf((char *)ext_info, 32, "%s", cfg_data.tianqi_appid.c_str());
-        }
-        else if (!strcmp(param_key, "tianqi_appsecret"))
-        {
-            snprintf((char *)ext_info, 32, "%s", cfg_data.tianqi_appsecret.c_str());
-        }
-        else if (!strcmp(param_key, "tianqi_addr"))
-        {
-            snprintf((char *)ext_info, 32, "%s", cfg_data.tianqi_addr.c_str());
-        }
-        else if (!strcmp(param_key, "weatherUpdataInterval"))
-        {
-            snprintf((char *)ext_info, 32, "%lu", cfg_data.weatherUpdataInterval);
-        }
-        else if (!strcmp(param_key, "timeUpdataInterval"))
-        {
-            snprintf((char *)ext_info, 32, "%lu", cfg_data.timeUpdataInterval);
-        }
-        else
-        {
-            snprintf((char *)ext_info, 32, "%s", "NULL");
-        }
-    }
-    break;
-    case APP_MESSAGE_SET_PARAM:
-    {
-        char *param_key = (char *)message;
-        char *param_val = (char *)ext_info;
-        if (!strcmp(param_key, "tianqi_appid"))
-        {
-            cfg_data.tianqi_appid = param_val;
-        }
-        else if (!strcmp(param_key, "tianqi_appsecret"))
-        {
-            cfg_data.tianqi_appsecret = param_val;
-        }
-        else if (!strcmp(param_key, "tianqi_addr"))
-        {
-            cfg_data.tianqi_addr = param_val;
-        }
-        else if (!strcmp(param_key, "weatherUpdataInterval"))
-        {
-            cfg_data.weatherUpdataInterval = atol(param_val);
-        }
-        else if (!strcmp(param_key, "timeUpdataInterval"))
-        {
-            cfg_data.timeUpdataInterval = atol(param_val);
-        }
-    }
-    break;
-    case APP_MESSAGE_READ_CFG:
-    {
-        read_config(&cfg_data);
-    }
-    break;
-    case APP_MESSAGE_WRITE_CFG:
-    {
-        write_config(&cfg_data);
-    }
-    break;
-    default:
-        break;
-    }
+    //         //get_daliyWeather(run_data->wea.daily_max, run_data->wea.daily_min);
+    //         if (run_data->clock_page == 1)
+    //         {
+    //             //display_curve(run_data->wea.daily_max, run_data->wea.daily_min, LV_SCR_LOAD_ANIM_NONE);
+    //         }
+    //     };
+    //     break;
+    //     default:
+    //         break;
+    //     }
+    // }
+    // break;
+    // case APP_MESSAGE_GET_PARAM:
+    // {
+    //     char *param_key = (char *)message;
+    //     if (!strcmp(param_key, "tianqi_appid"))
+    //     {
+    //         snprintf((char *)ext_info, 32, "%s", cfg_data.tianqi_appid.c_str());
+    //     }
+    //     else if (!strcmp(param_key, "tianqi_appsecret"))
+    //     {
+    //         snprintf((char *)ext_info, 32, "%s", cfg_data.tianqi_appsecret.c_str());
+    //     }
+    //     else if (!strcmp(param_key, "tianqi_addr"))
+    //     {
+    //         snprintf((char *)ext_info, 32, "%s", cfg_data.tianqi_addr.c_str());
+    //     }
+    //     else if (!strcmp(param_key, "weatherUpdataInterval"))
+    //     {
+    //         snprintf((char *)ext_info, 32, "%lu", cfg_data.weatherUpdataInterval);
+    //     }
+    //     else if (!strcmp(param_key, "timeUpdataInterval"))
+    //     {
+    //         snprintf((char *)ext_info, 32, "%lu", cfg_data.timeUpdataInterval);
+    //     }
+    //     else
+    //     {
+    //         snprintf((char *)ext_info, 32, "%s", "NULL");
+    //     }
+    // }
+    // break;
+    // case APP_MESSAGE_SET_PARAM:
+    // {
+    //     char *param_key = (char *)message;
+    //     char *param_val = (char *)ext_info;
+    //     if (!strcmp(param_key, "tianqi_appid"))
+    //     {
+    //         cfg_data.tianqi_appid = param_val;
+    //     }
+    //     else if (!strcmp(param_key, "tianqi_appsecret"))
+    //     {
+    //         cfg_data.tianqi_appsecret = param_val;
+    //     }
+    //     else if (!strcmp(param_key, "tianqi_addr"))
+    //     {
+    //         cfg_data.tianqi_addr = param_val;
+    //     }
+    //     else if (!strcmp(param_key, "weatherUpdataInterval"))
+    //     {
+    //         cfg_data.weatherUpdataInterval = atol(param_val);
+    //     }
+    //     else if (!strcmp(param_key, "timeUpdataInterval"))
+    //     {
+    //         cfg_data.timeUpdataInterval = atol(param_val);
+    //     }
+    // }
+    // break;
+    // case APP_MESSAGE_READ_CFG:
+    // {
+    //     read_config(&cfg_data);
+    // }
+    // break;
+    // case APP_MESSAGE_WRITE_CFG:
+    // {
+    //     write_config(&cfg_data);
+    // }
+    // break;
+    // default:
+    //     break;
+    // }
 }
 
-APP_OBJ bullet_counter_app = {BULLET_COUNTER_APP_NAME, &app_bullet_counter, "GeekFantasy",
+APP_OBJ bullet_counter_app = {BULLET_COUNTER_APP_NAME, &app_bullet_counter, "",
                               bullet_counter_init, bullet_counter_process, bullet_counter_background_task,
                               bullet_counter_exit_callback, bullet_counter_message_handle};
