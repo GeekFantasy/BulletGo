@@ -74,10 +74,12 @@ void bullet_counter_gui_del(void)
 
 void display_bullet_status(int bullet_cnt, bool is_loaded)
 {
-    scr_counter = lv_scr_act();
-    lv_obj_clean(scr_counter);
+    // scr_counter = lv_scr_act();
+    // lv_obj_clean(scr_counter);
 
-    //scr_counter  = lv_obj_create(NULL);
+    if(NULL != scr_counter)
+        lv_obj_clean(scr_counter);
+    scr_counter  = lv_obj_create(NULL);
 
     lv_obj_t * label_counter = lv_label_create(scr_counter);
     lv_obj_t * cont_bullets = lv_obj_create(scr_counter);
@@ -87,10 +89,9 @@ void display_bullet_status(int bullet_cnt, bool is_loaded)
 
     static lv_style_t default_style;
     lv_style_init(&default_style);
-    lv_style_set_bg_opa(&default_style, LV_OPA_COVER);
+    //lv_style_set_bg_opa(&default_style, LV_OPA_COVER);
     lv_style_set_bg_color(&default_style, lv_color_black());
-
-    //lv_obj_add_style(scr_counter, &default_style, 0);
+    lv_obj_add_style(scr_counter, &default_style, LV_STATE_DEFAULT);
 
     static lv_style_t label_style;
     lv_style_init(&label_style);
@@ -151,4 +152,6 @@ void display_bullet_status(int bullet_cnt, bool is_loaded)
         lv_obj_t *img = lv_img_create(cont_bullets);
         lv_img_set_src(img, &bullet_outline_small);
     }
+
+    lv_scr_load(scr_counter);
 }
