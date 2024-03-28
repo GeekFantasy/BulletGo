@@ -1,5 +1,7 @@
 #include "bullet_counter_gui.h"
 
+#define  ALERT_BULLET_NUM   2
+
 extern const lv_img_dsc_t bullet_counter_loaded;
 extern const lv_img_dsc_t bullet_counter_not_loaded;
 extern const lv_img_dsc_t bullet;
@@ -139,6 +141,10 @@ void display_bullet_status(int bullet_cnt, bool is_loaded)
     char str[5];
     itoa(bullet_cnt, str, 10);
     lv_label_set_text(label_counter, str);
+    if(bullet_cnt <= ALERT_BULLET_NUM)
+        lv_obj_set_style_text_color(label_counter, lv_color_make(255, 0, 0), LV_STATE_DEFAULT);
+    else
+        lv_obj_set_style_text_color(label_counter, lv_color_make(0, 255, 0), LV_STATE_DEFAULT);
 
     if (is_loaded)
         lv_img_set_src(img_ouline, &red_outline);
