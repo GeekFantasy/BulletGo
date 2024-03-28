@@ -74,8 +74,10 @@ void bullet_counter_gui_del(void)
 
 void display_bullet_status(int bullet_cnt, bool is_loaded)
 {
-    // scr_counter = lv_scr_act();
-    // lv_obj_clean(scr_counter);
+    lv_obj_t * act_obj = lv_scr_act();
+    if (act_obj == scr_counter)
+        return;
+    lv_obj_clean(act_obj); // 清空此前页面
 
     if(NULL != scr_counter)
         lv_obj_clean(scr_counter);
