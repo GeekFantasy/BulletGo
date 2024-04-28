@@ -67,6 +67,8 @@ void IMU::init(uint8_t order, uint8_t auto_calibration,
         mpu_cfg->x_accel_offset = mpu.getXAccelOffset();
         mpu_cfg->y_accel_offset = mpu.getYAccelOffset();
         mpu_cfg->z_accel_offset = mpu.getZAccelOffset();
+        Serial.printf("gyro x: %d, y: %d, z:%d \n", mpu_cfg->x_gyro_offset, mpu_cfg->y_gyro_offset, mpu_cfg->z_gyro_offset);
+        Serial.printf("accel x: %d, y: %d, z:%d \n", mpu_cfg->x_accel_offset, mpu_cfg->y_accel_offset, mpu_cfg->z_accel_offset);
     }
 
     Serial.print(F("Initialization MPU6050 success.\n"));

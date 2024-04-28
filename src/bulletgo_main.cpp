@@ -78,7 +78,7 @@ void setup()
     app_controller->read_config(&app_controller->rgb_cfg);
 
     /*** Init screen ***/
-    app_controller->sys_cfg.rotation = 2; // Force the rotaion to 2 
+    app_controller->sys_cfg.rotation = 0; // Force the rotaion to 2 
     screen.init(app_controller->sys_cfg.rotation,
                 app_controller->sys_cfg.backLight);
 
@@ -101,15 +101,6 @@ void setup()
     app_controller->app_install(&weather_app);
 #endif
 
-    //app_controller->app_install(&server_app);
-
-#if APP_IDEA_ANIM_USE
-    app_controller->app_install(&idea_app);
-#endif
-
-#if APP_SETTING_USE
-    app_controller->app_install(&settings_app);
-#endif
 #if APP_GAME_2048_USE
     app_controller->app_install(&game_2048_app);
 #endif

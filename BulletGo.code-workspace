@@ -1,0 +1,15 @@
+{
+	"folders": [
+		{
+			"name": "BulletGo",
+			"path": "."
+		}
+	],
+	"settings": {
+		"files.associations": {
+			"bullet_counter_gui.h": "c",
+			"lvgl.h": "c",
+			"bullet_sensor.h": "c"
+		}
+	}
+}

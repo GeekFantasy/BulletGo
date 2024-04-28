@@ -138,6 +138,7 @@ void display_bullet_status(int bullet_cnt, bool is_loaded)
     char str[5];
     itoa(bullet_sum, str, 10);
     lv_label_set_text(label_counter, str);
+
     if(bullet_sum <= ALERT_BULLET_NUM)
         lv_obj_set_style_text_color(label_counter, lv_color_make(255, 0, 0), LV_STATE_DEFAULT);
     else
@@ -155,7 +156,6 @@ void display_bullet_status(int bullet_cnt, bool is_loaded)
         lv_anim_start(&anim_load);
         prev_load_state = is_loaded;
     }
-
 
     if(prev_bullet_cnt != bullet_cnt) // check if bullet count changed
     {

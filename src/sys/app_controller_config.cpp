@@ -84,9 +84,9 @@ void AppController::write_config(SysUtilConfig *cfg)
     g_flashCfg.writeFile(APP_CTRL_CONFIG_PATH, w_data.c_str());
 
     // 立即生效相关配置
-    screen.setBackLight(cfg->backLight / 100.0);
-    tft->setRotation(cfg->rotation);
-    mpu.setOrder(cfg->mpu_order);
+    //screen.setBackLight(cfg->backLight / 100.0);
+    //tft->setRotation(cfg->rotation);
+    //mpu.setOrder(cfg->mpu_order);
 }
 
 void AppController::read_config(SysMpuConfig *cfg)
