@@ -27,7 +27,8 @@ static void bullet_counter_process(AppController *sys,
     }
 
     Serial.printf("Display bullet status. \n");
-    display_bullet_status(bullet_sensor.getNum(), bullet_sensor.isLoaded());
+    //display_bullet_status(bullet_sensor.getNum(), bullet_sensor.isLoaded());
+    display_bullet_status_v2(bullet_sensor.getNum(), bullet_sensor.isLoaded(), bullet_sensor.magazineExist());
 }
 
 static void bullet_counter_background_task(AppController *sys,

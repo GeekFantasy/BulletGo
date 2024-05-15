@@ -22,7 +22,7 @@ static lv_obj_t *img_bullet_outline = NULL;
 static lv_anim_t anim_shoot;
 static lv_anim_t anim_load;
 
-static bool prev_load_state = true;
+static bool prev_load_state = false;
 static int prev_bullet_cnt = 0;
 
 void display_not_loaded(lv_anim_t * a)
@@ -155,6 +155,59 @@ void display_bullet_status(int bullet_cnt, bool is_loaded)
         lv_obj_clear_flag(img_bullet, LV_OBJ_FLAG_HIDDEN);
         lv_anim_start(&anim_load);
         prev_load_state = is_loaded;
+    }
+
+    if(prev_bullet_cnt != bullet_cnt) // check if bullet count changed
+    {
+        lv_obj_clean(cont_bullets);
+        for (int i = 0; i < bullet_cnt; i++)
+        {
+            lv_obj_t *img = lv_img_create(cont_bullets);
+            lv_img_set_src(img, &bullet_small);
+        }
+
+        for (int j = bullet_cnt; j < 7; j++)
+        {
+            lv_obj_t *img = lv_img_create(cont_bullets);
+            lv_img_set_src(img, &bullet_outline_small);
+        }
+        prev_bullet_cnt = bullet_cnt;
+    }    
+}
+
+void display_bullet_status_v2(int bullet_cnt, bool is_loaded, bool is_mag_exist) 
+{
+    int bullet_sum = 0;
+    if(is_mag_exist)
+        bullet_sum = is_loaded ? (bullet_cnt + 1) : bullet_cnt;
+    else
+        bullet_sum = is_loaded ? 1 : 0;
+
+    char str[5];
+    itoa(bullet_sum, str, 10);
+    lv_label_set_text(label_counter, str);
+
+    if(bullet_sum <= ALERT_BULLET_NUM)
+        lv_obj_set_style_text_color(label_counter, lv_color_make(255, 0, 0), LV_STATE_DEFAULT);
+    else
+        lv_obj_set_style_text_color(label_counter, lv_color_make(0, 255, 0), LV_STATE_DEFAULT);
+
+    if((is_loaded != prev_load_state) && prev_load_state == true )
+    {
+        lv_anim_start(&anim_shoot);
+        prev_load_state = is_loaded;
+    }
+    else if((is_loaded != prev_load_state) && prev_load_state == false)
+    {
+        lv_obj_add_flag(img_bullet_outline, LV_OBJ_FLAG_HIDDEN);
+        lv_obj_clear_flag(img_bullet, LV_OBJ_FLAG_HIDDEN);
+        lv_anim_start(&anim_load);
+        prev_load_state = is_loaded;
+    }
+
+    if(!is_mag_exist)
+    {
+        bullet_cnt = 0;
     }
 
     if(prev_bullet_cnt != bullet_cnt) // check if bullet count changed
