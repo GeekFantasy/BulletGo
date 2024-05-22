@@ -78,7 +78,7 @@ void setup()
     app_controller->read_config(&app_controller->rgb_cfg);
 
     /*** Init screen ***/
-    app_controller->sys_cfg.rotation = 0; // Force the rotaion to 2 
+    app_controller->sys_cfg.rotation = 0; // Force the rotaion to 2
     screen.init(app_controller->sys_cfg.rotation,
                 app_controller->sys_cfg.backLight);
 
@@ -126,6 +126,7 @@ void setup()
 
     // 先初始化一次动作数据 防空指针
     act_info = mpu.getAction();
+
     // 定义一个mpu6050的动作检测定时器
     xTimerAction = xTimerCreate("Action Check",
                                 200 / portTICK_PERIOD_MS,
@@ -147,11 +148,18 @@ void loop()
 
     Serial.printf("Time: %d \n", GET_SYS_MILLIS());
 
-    //Read button state
+    // Read button state
     Serial.printf("Button State: %d, Event: %d \n", button.getState(), event);
-    
-    Serial.printf("Bullet Sensor, bullet cnt: %d, loaded: %s, mag exist: %s\n", 
-                    bullet_sensor.getNum(), bullet_sensor.isLoaded() ? "true" : "false", 
-                    bullet_sensor.magazineExist() ? "true" : "false");
 
+    Serial.printf("Bullet Sensor, bullet cnt: %d, loaded: %s, mag exist: %s\n",
+                  bullet_sensor.getNum(), bullet_sensor.isLoaded() ? "true" : "false",
+                  bullet_sensor.magazineExist() ? "true" : "false");
+
+    mpu.updateYPR();
+    Serial.print("YPR:\t");
+    Serial.print(mpu.getYaw());
+    Serial.print("\t");
+    Serial.print(mpu.getPitch());
+    Serial.print("\t");
+    Serial.println(mpu.getRoll());
 }

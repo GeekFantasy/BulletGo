@@ -2,10 +2,11 @@
 #define IMU_H
 
 #include <I2Cdev.h>
-#include <MPU6050.h>
+#include <MPU6050_6Axis_MotionApps20.h>
 #include "lv_port_indev.h"
 #include <list>
 #define ACTION_HISTORY_BUF_LEN 5
+#define INTERRUPT_PIN   25
 
 extern int32_t encoder_diff;
 extern lv_indev_state_t encoder_state;
@@ -66,6 +67,10 @@ private:
     long last_update_time;
     uint8_t order; // 表示方位，x与y是否对换
 
+    float ypr[3]; // [yaw, pitch, roll]   yaw/pitch/roll container and gravity vector
+    int16_t temperature;
+    bool dmpReady = false; // set true if DMP init was successful
+
 public:
     ImuAction action_info;
     // 用来储存历史动作
@@ -82,6 +87,12 @@ public:
     ImuAction *update(int interval);
     ImuAction *getAction(void); // 获取动作
     void getVirtureMotion6(ImuAction *action_info);
+
+    void updateYPR();
+    float getYaw();
+    float getPitch();
+    float getRoll();
+    int16_t getTemperature();
 };
 
 #endif

@@ -6,6 +6,12 @@ const char *active_type_info[] = {"TURN_RIGHT", "RETURN",
                                   "DOWN", "GO_FORWORD",
                                   "SHAKE", "UNKNOWN"};
 
+volatile bool mpuInterrupt = false;
+void dmpDataReady()
+{
+    mpuInterrupt = true;
+}
+
 IMU::IMU()
 {
     action_info.isValid = false;
@@ -67,8 +73,43 @@ void IMU::init(uint8_t order, uint8_t auto_calibration,
         mpu_cfg->x_accel_offset = mpu.getXAccelOffset();
         mpu_cfg->y_accel_offset = mpu.getYAccelOffset();
         mpu_cfg->z_accel_offset = mpu.getZAccelOffset();
-        Serial.printf("gyro x: %d, y: %d, z:%d \n", mpu_cfg->x_gyro_offset, mpu_cfg->y_gyro_offset, mpu_cfg->z_gyro_offset);
-        Serial.printf("accel x: %d, y: %d, z:%d \n", mpu_cfg->x_accel_offset, mpu_cfg->y_accel_offset, mpu_cfg->z_accel_offset);
+        Serial.printf("gyro offset x: %d, y: %d, z:%d \n", mpu_cfg->x_gyro_offset, mpu_cfg->y_gyro_offset, mpu_cfg->z_gyro_offset);
+        Serial.printf("accel offset x: %d, y: %d, z:%d \n", mpu_cfg->x_accel_offset, mpu_cfg->y_accel_offset, mpu_cfg->z_accel_offset);
+    }
+
+    // Initialize interrupts and set our DMP Ready flag
+    pinMode(INTERRUPT_PIN, INPUT);
+    uint8_t devStatus = mpu.dmpInitialize();
+    if (devStatus == 0)
+    {
+        // Calibration Time: generate offsets and calibrate our MPU6050
+        mpu.CalibrateAccel(6);
+        mpu.CalibrateGyro(6);
+        mpu.PrintActiveOffsets();
+        // turn on the DMP, now that it's ready
+        Serial.println(F("Enabling DMP..."));
+        mpu.setDMPEnabled(true);
+
+        // enable Arduino interrupt detection
+        Serial.print(F("Enabling interrupt detection (Arduino external interrupt "));
+        Serial.print(digitalPinToInterrupt(INTERRUPT_PIN));
+        Serial.println(F(")..."));
+        attachInterrupt(digitalPinToInterrupt(INTERRUPT_PIN), dmpDataReady, RISING);
+        uint8_t mpuIntStatus = mpu.getIntStatus();
+
+        // set our DMP Ready flag so the main loop() function knows it's okay to use it
+        Serial.println(F("DMP ready! Waiting for first interrupt..."));
+        dmpReady = true;
+    }
+    else
+    {
+        // ERROR!
+        // 1 = initial memory load failed
+        // 2 = DMP configuration updates failed
+        // (if it's going to break, usually the code will be 1)
+        Serial.print(F("DMP Initialization failed (code "));
+        Serial.print(devStatus);
+        Serial.println(F(")"));
     }
 
     Serial.print(F("Initialization MPU6050 success.\n"));
@@ -294,4 +335,50 @@ void IMU::getVirtureMotion6(ImuAction *action_info)
         action_info->v_gx = action_info->v_gy;
         action_info->v_gy = swap_tmp;
     }
+}
+
+void IMU::updateYPR()
+{
+    // orientation/motion vars
+    Quaternion q;        // [w, x, y, z]         quaternion container
+    VectorFloat gravity; // [x, y, z]            gravity vector
+
+    // MPU control/status vars
+    uint8_t fifoBuffer[64]; // FIFO storage buffer
+
+    // if programming failed, don't try to do anything
+    if (!dmpReady)
+        return;
+
+    // read a packet from FIFO
+    if (mpu.dmpGetCurrentFIFOPacket(fifoBuffer))
+    { 
+        mpu.dmpGetQuaternion(&q, fifoBuffer);
+        mpu.dmpGetGravity(&gravity, &q);
+        mpu.dmpGetYawPitchRoll(ypr, &q, &gravity);
+    }
+
+    // read temperature
+    temperature = mpu.getTemperature();
+}
+
+
+float IMU::getYaw()
+{
+    return ypr[0] * 180 / M_PI;
+}
+
+float IMU::getPitch()
+{
+    return ypr[1] * 180 / M_PI;
+}
+
+float IMU::getRoll()
+{
+    return ypr[2] * 180 / M_PI;
+}
+
+int16_t IMU::getTemperature()
+{
+    return temperature;
 }
