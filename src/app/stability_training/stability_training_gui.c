@@ -2,11 +2,14 @@
 
 #define ALERT_BULLET_NUM 2
 
-extern const lv_font_t digifacewide;
+extern const lv_font_t digifacewide128;
+extern const lv_font_t digifacewide144;
+extern const lv_font_t digifacewide156;
 
 static lv_obj_t *scr_training = NULL;
 static lv_obj_t *dot;
 
+static lv_obj_t *count_down_label;
 static lv_obj_t *time_label;
 static lv_obj_t *score_label;
 
@@ -83,7 +86,7 @@ static void time_and_score_update(int second, int score)
 
         snprintf(score_str, sizeof(score_str), "%d", score);
         lv_label_set_text(score_label, score_str);
-        lv_obj_move_foreground(score_label);  
+        lv_obj_move_foreground(score_label);
     }
 }
 
@@ -97,6 +100,25 @@ static void focus_dot_redraw(lv_color_t color, int x, int y)
         lv_obj_set_style_bg_color(dot, color, LV_PART_MAIN | LV_STATE_DEFAULT);     // 绿色背景
         lv_obj_set_style_shadow_color(dot, color, LV_PART_MAIN | LV_STATE_DEFAULT); // 光晕颜色
     }
+}
+
+void count_down_draw(lv_obj_t *screen, int count)
+{
+    if(count > 99)
+        return;
+
+    char count_str[3];
+    snprintf(count_str, sizeof(count_str), "%d", count);
+
+    if (NULL == count_down_label)
+    {
+        count_down_label = lv_label_create(scr_training);
+        lv_obj_set_style_text_font(count_down_label, &digifacewide144, LV_PART_MAIN | LV_STATE_DEFAULT);
+        lv_obj_set_style_text_color(count_down_label, lv_color_hex(0x0000FF), LV_PART_MAIN | LV_STATE_DEFAULT);
+        lv_obj_align(count_down_label, LV_ALIGN_CENTER, 0, 0);
+    }
+
+    lv_label_set_text(count_down_label, count_str);
 }
 
 void stability_training_gui_init()
@@ -116,6 +138,40 @@ void stability_training_gui_init()
     focus_dot_draw(scr_training, STABILITY_TRAINING_DOT_GREEEN, 0, 0);
     time_and_score_draw(scr_training, 00, 100);
     lv_scr_load(scr_training);
+}
+
+void count_down_gui_init(int count_down)
+{
+    lv_obj_t *act_obj = lv_scr_act();
+    if (act_obj == scr_training)
+        return;
+    lv_obj_clean(act_obj);
+
+    if (NULL != scr_training)
+        lv_obj_del(scr_training);
+
+    scr_training = lv_obj_create(NULL);
+    lv_obj_set_style_bg_color(scr_training, lv_color_black(), LV_PART_MAIN | LV_STATE_DEFAULT);
+    count_down_draw(scr_training, count_down);
+    lv_scr_load(scr_training);
+}
+
+void count_down_gui_update(int count_down)
+{
+    if(NULL != scr_training)
+    {
+        count_down_draw(scr_training, count_down);
+    }
+}
+
+void count_down_gui_release()
+{
+    if(NULL != scr_training)
+    {
+        lv_obj_clean(scr_training);
+        scr_training = NULL;
+        count_down_label = NULL;
+    }
 }
 
 void stability_training_gui_release(void)
