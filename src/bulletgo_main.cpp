@@ -97,6 +97,11 @@ void setup()
 #if APP_BULLET_COUNTER_USE
     app_controller->app_install(&bullet_counter_app);
 #endif
+
+#if APP_STABILITY_TRAINING_USE
+    app_controller->app_install(&stability_training_app);
+#endif
+
 #if APP_WEATHER_USE
     app_controller->app_install(&weather_app);
 #endif
@@ -132,6 +137,7 @@ void setup()
                                 200 / portTICK_PERIOD_MS,
                                 pdTRUE, (void *)0, actionCheckHandle);
     xTimerStart(xTimerAction, 0);
+
 }
 
 void loop()

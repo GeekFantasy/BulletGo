@@ -61,8 +61,6 @@ void IMU::init(uint8_t order, uint8_t auto_calibration,
     }
     else
     {
-        // 启动自动校准
-        // 7次循环自动校正
         mpu.CalibrateAccel(7);
         mpu.CalibrateGyro(7);
         mpu.PrintActiveOffsets();
@@ -82,10 +80,6 @@ void IMU::init(uint8_t order, uint8_t auto_calibration,
     uint8_t devStatus = mpu.dmpInitialize();
     if (devStatus == 0)
     {
-        // // Calibration Time: generate offsets and calibrate our MPU6050
-        // mpu.CalibrateAccel(7);
-        // mpu.CalibrateGyro(7);
-        // mpu.PrintActiveOffsets();
         // turn on the DMP, now that it's ready
         Serial.println(F("Enabling DMP..."));
         mpu.setDMPEnabled(true);

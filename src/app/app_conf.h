@@ -92,4 +92,10 @@
 #include "app/bullet_counter/bullet_counter.h"
 #endif
 
+// 稳定性训练
+#define APP_STABILITY_TRAINING_USE 1
+#if APP_STABILITY_TRAINING_USE
+#include "app/stability_training/stability_training.h"
+#endif
+
 #endif
