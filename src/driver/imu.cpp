@@ -207,8 +207,8 @@ ImuAction *IMU::getAction(void)
     ImuAction tmp_info;
     getVirtureMotion6(&tmp_info);
 
-    Serial.printf("gx = %d\tgy = %d\tgz = %d", tmp_info.v_gx, tmp_info.v_gy, tmp_info.v_gz);
-    Serial.printf("\tax = %d\tay = %d\taz = %d\n", tmp_info.v_ax, tmp_info.v_ay, tmp_info.v_az);
+    // Serial.printf("gx = %d\tgy = %d\tgz = %d", tmp_info.v_gx, tmp_info.v_gy, tmp_info.v_gz);
+    // Serial.printf("\tax = %d\tay = %d\taz = %d\n", tmp_info.v_ax, tmp_info.v_ay, tmp_info.v_az);
 
     tmp_info.active = ACTIVE_TYPE::UNKNOWN;
 

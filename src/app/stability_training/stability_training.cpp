@@ -94,7 +94,7 @@ static void stability_training_process(AppController *sys,
 
         // Calc the time
         seconds = (lv_tick_get() - tick_init) / 1000;
-        stability_training_gui_update(dot_color, px_x, px_y, seconds, (int)score);
+        stability_training_gui_update(dot_color, px_x, px_y + 10, seconds, (int)score);
     }
 }
 

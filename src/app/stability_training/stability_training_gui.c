@@ -61,7 +61,7 @@ static void time_and_score_draw(lv_obj_t *screen, int time, int score)
     time_label = lv_label_create(screen);
     snprintf(time_str, sizeof(time_str), "%02d:%02d", time / 60, time % 60);
     lv_label_set_text(time_label, time_str);
-    lv_obj_set_style_text_font(time_label, &lv_font_montserrat_20, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_font(time_label, &lv_font_montserrat_24, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_text_color(time_label, lv_color_white(), LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_align(time_label, LV_ALIGN_TOP_LEFT, 10, 10); // 左上角，距离边缘10像素
 
@@ -69,9 +69,9 @@ static void time_and_score_draw(lv_obj_t *screen, int time, int score)
     score_label = lv_label_create(screen);
     snprintf(score_str, sizeof(score_str), "%d", score);
     lv_label_set_text(score_label, score_str);
-    lv_obj_set_style_text_font(score_label, &lv_font_montserrat_20, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_font(score_label, &lv_font_montserrat_24, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_text_color(score_label, lv_color_white(), LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_align(score_label, LV_ALIGN_TOP_RIGHT, -10, 10); // 右上角，距离边缘10像素
+    lv_obj_align(score_label, LV_ALIGN_TOP_RIGHT, -15, 10); // 右上角，距离边缘10像素
 }
 
 static void time_and_score_update(int second, int score)
@@ -133,9 +133,10 @@ void stability_training_gui_init()
 
     scr_training = lv_obj_create(NULL);
     lv_obj_set_style_bg_color(scr_training, lv_color_black(), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_clear_flag(scr_training, LV_OBJ_FLAG_SCROLLABLE);
 
-    bk_target_draw(scr_training, 0, 0, 105, 5);
-    focus_dot_draw(scr_training, STABILITY_TRAINING_DOT_GREEEN, 0, 0);
+    bk_target_draw(scr_training, 0, 10, 105, 5);
+    focus_dot_draw(scr_training, STABILITY_TRAINING_DOT_GREEEN, 0, 10);
     time_and_score_draw(scr_training, 00, 100);
     lv_scr_load(scr_training);
 }
