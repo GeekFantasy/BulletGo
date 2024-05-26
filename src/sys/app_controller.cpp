@@ -156,7 +156,7 @@ int AppController::main_process(ImuAction *act_info, ButtonEvent btn_event)
         send_to(CTRL_NAME, CTRL_NAME, APP_MESSAGE_WIFI_DISCONN, 0, NULL);
     }
 
-    if (0 == app_exit_flag)
+    if (0 == app_exit_flag) // 没有进入任何APP
     {
         // 当前没有进入任何app
         lv_scr_load_anim_t anim_type = LV_SCR_LOAD_ANIM_NONE;

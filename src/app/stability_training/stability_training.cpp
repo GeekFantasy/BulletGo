@@ -36,12 +36,12 @@ static void stability_training_process(AppController *sys,
 {
     if (0 == btn_event)
     {
-        Serial.printf("Will exit stability training app. \n");
+        Serial.printf("Exit stability training app. \n");
         sys->app_exit(); // 退出APP
         return;
     }
 
-    if (is_counting_down)
+    if (is_counting_down) // Show counting down UI
     {
         int sec = (lv_tick_get() - tick_init) / 1000;
         if (sec >= count_down)
@@ -54,9 +54,9 @@ static void stability_training_process(AppController *sys,
             count_down_gui_update(count_down - sec);
         }
     }
-    else
+    else  // Show stability training UI
     {
-        if (!is_training_ui_intialized)
+        if (!is_training_ui_intialized) // Initialize stability training UI first
         {
             stability_training_gui_init();
 
@@ -71,30 +71,32 @@ static void stability_training_process(AppController *sys,
 
             is_training_ui_intialized = true;
         }
+        else  // Update stability training UI
+        {
+            // Get the current position
+            mpu.updateYPR();
+            pitch_curr = mpu.getPitch();
+            roll_curr = mpu.getRoll();
 
-        // Get the current position
-        mpu.updateYPR();
-        pitch_curr = mpu.getPitch();
-        roll_curr = mpu.getRoll();
+            // Calc the positioni of the dot
+            int px_y = (int)((pitch_curr - pitch_init) * 60);
+            int px_x = (int)((roll_curr - roll_init) * 60);
+            px_y = abs(px_y) < 120 ? px_y : (px_y < 0 ? -120 : 120);
+            px_x = abs(px_x) < 120 ? px_x : (px_x < 0 ? -120 : 120);
+            lv_color_t dot_color = (abs(px_y) > 20 || abs(px_x) > 20) ? STABILITY_TRAINING_DOT_RED : STABILITY_TRAINING_DOT_GREEEN;
 
-        // Calc the positioni of the dot
-        int px_y = (int)((pitch_curr - pitch_init) * 60);
-        int px_x = (int)((roll_curr - roll_init) * 60);
-        px_y = abs(px_y) < 120 ? px_y : (px_y < 0 ? -120 : 120);
-        px_x = abs(px_x) < 120 ? px_x : (px_x < 0 ? -120 : 120);
-        lv_color_t dot_color = (abs(px_y) > 20 || abs(px_x) > 20) ? STABILITY_TRAINING_DOT_RED : STABILITY_TRAINING_DOT_GREEEN;
+            // Calc the score
+            int max_px = max(abs(px_y), abs(px_x));
+            int score_tmp = 105 - max_px;
+            score_tmp = score_tmp > 0 ? score_tmp : 0;
+            score_tmp = score_tmp < 100 ? score_tmp : 100;
+            score = (score * score_cnt + score_tmp) / (score_cnt + 1);
+            score_cnt++;
 
-        // Calc the score
-        int max_px = max(abs(px_y), abs(px_x));
-        int score_tmp = 105 - max_px;
-        score_tmp = score_tmp > 0 ? score_tmp : 0;
-        score_tmp = score_tmp < 100 ? score_tmp : 100;
-        score = (score * score_cnt + score_tmp) / (score_cnt + 1);
-        score_cnt++;
-
-        // Calc the time
-        seconds = (lv_tick_get() - tick_init) / 1000;
-        stability_training_gui_update(dot_color, px_x, px_y + 10, seconds, (int)score);
+            // Calc the time
+            seconds = (lv_tick_get() - tick_init) / 1000;
+            stability_training_gui_update(dot_color, px_x, px_y + 10, seconds, (int)score);
+        }
     }
 }
 

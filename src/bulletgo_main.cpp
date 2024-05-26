@@ -155,17 +155,17 @@ void loop()
     Serial.printf("Time: %d \n", GET_SYS_MILLIS());
 
     // Read button state
-    // Serial.printf("Button State: %d, Event: %d \n", button.getState(), event);
+    Serial.printf("Button State: %d, Event: %d \n", button.getState(), event);
 
-    // Serial.printf("Bullet Sensor, bullet cnt: %d, loaded: %s, mag exist: %s\n",
-    //               bullet_sensor.getNum(), bullet_sensor.isLoaded() ? "true" : "false",
-    //               bullet_sensor.magazineExist() ? "true" : "false");
+    Serial.printf("Bullet Sensor, bullet cnt: %d, loaded: %s, mag exist: %s\n",
+                  bullet_sensor.getNum(), bullet_sensor.isLoaded() ? "true" : "false",
+                  bullet_sensor.magazineExist() ? "true" : "false");
 
-    // mpu.updateYPR();
-    // Serial.print("YPR:\t");
-    // Serial.print(mpu.getYaw());
-    // Serial.print("\t");
-    // Serial.print(mpu.getPitch());
-    // Serial.print("\t");
-    // Serial.println(mpu.getRoll());
+    mpu.updateYPR();
+    Serial.print("YPR:\t");
+    Serial.print(mpu.getYaw());
+    Serial.print("\t");
+    Serial.print(mpu.getPitch());
+    Serial.print("\t");
+    Serial.println(mpu.getRoll());
 }
