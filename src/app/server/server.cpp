@@ -140,6 +140,7 @@ static void server_process(AppController *sys,
 
     if (RETURN == action->active)
     {
+        sys->send_to(SERVER_APP_NAME, CTRL_NAME, APP_MESSAGE_WIFI_DISCONN, NULL, NULL);
         stop_web_config();
         sys->app_exit();
         return;
@@ -188,8 +189,8 @@ static void server_background_task(AppController *sys,
 
 static int server_exit_callback(void *param)
 {
-    setting_gui_del();
-
+    setting_gui_del(); 
+    
     // 释放运行数据
     if (NULL != run_data)
     {

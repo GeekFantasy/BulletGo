@@ -17,7 +17,7 @@ extern ESP8266WebServer server;
 #include <ESPmDNS.h>
 #include <DNSServer.h>
 #include <HTTPClient.h>
-extern WebServer motion_server;
+
 #endif
 
 extern APP_OBJ motion_state_server_app;

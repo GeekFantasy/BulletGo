@@ -1,14 +1,13 @@
 #include "motion_state_server.h"
 #include "motion_state_server_gui.h"
-#include "motion_state_web_setting.h"
+#include "motion_state_api.h"
 #include "sys/app_controller.h"
 #include "app/app_conf.h"
 #include "network.h"
 #include "common.h"
 
-#define SERVER_REFLUSH_INTERVAL 5000UL // 配置界面重新刷新时间(5s)
+#define SERVER_REFLUSH_INTERVAL 10000UL // 配置界面重新刷新时间(5s)
 #define DNS_PORT 53                    // DNS端口
-WebServer motion_server(80);
 
 // DNSServer dnsServer;
 
@@ -21,28 +20,6 @@ struct ServerAppRunData
 
 static ServerAppRunData *run_data = NULL;
 
-void start_motion_web_config()
-{
-    // 首页
-    motion_server.on("/motion-state", HTTP_GET, motion_data_api);
-
-    //init_motion_page_header();
-    //init_motion_page_footer();
-
-    motion_server.begin();
-    // MDNS.addService("http", "tcp", 80);
-    Serial.println("HTTP server started");
-
-    // dnsServer.start(DNS_PORT, "*", gateway);
-}
-
-void stop_motion_web_config()
-{
-    run_data->web_start = 0;
-    run_data->req_sent = 0;
-    motion_server.stop();
-    motion_server.close();
-}
 
 static int motion_server_init(AppController *sys)
 {
@@ -59,11 +36,11 @@ static void motion_server_process(AppController *sys,
                            const ImuAction *action,
                            int btn_event)
 {
-    lv_scr_load_anim_t anim_type = LV_SCR_LOAD_ANIM_NONE;
-
     if (RETURN == action->active)
     {
-        stop_motion_web_config();
+        run_data->web_start = 0;
+        run_data->req_sent = 0;
+        stop_motion_api();
         sys->app_exit();
         return;
     }
@@ -84,7 +61,7 @@ static void motion_server_process(AppController *sys,
     }
     else if (1 == run_data->web_start)
     {
-        motion_server.handleClient(); // 一定需要放在循环里扫描
+        motion_api_handle(); // 一定需要放在循环里扫描
         // dnsServer.processNextRequest();
         if (doDelayMillisTime(SERVER_REFLUSH_INTERVAL, &run_data->serverReflushPreMillis, false) == true)
         {
@@ -138,7 +115,7 @@ static void motion_server_message_handle(const char *from, const char *to,
             WiFi.localIP().toString().c_str(),
             WiFi.softAPIP().toString().c_str(),
             LV_SCR_LOAD_ANIM_NONE);
-        start_motion_web_config();
+        start_motion_api();
         run_data->web_start = 1;
     }
     break;
