@@ -102,6 +102,10 @@ void setup()
     app_controller->app_install(&stability_training_app);
 #endif
 
+#if APP_MOTION_STATE_SERVER_USE
+    app_controller->app_install(&motion_state_server_app);
+#endif
+
 #if APP_WEATHER_USE
     app_controller->app_install(&weather_app);
 #endif
@@ -109,6 +113,11 @@ void setup()
 #if APP_GAME_2048_USE
     app_controller->app_install(&game_2048_app);
 #endif
+
+#if APP_WEB_SERVER_USE
+    app_controller->app_install(&server_app);
+#endif
+
 
     // 自启动APP
     app_controller->app_auto_start();
@@ -161,11 +170,11 @@ void loop()
                   bullet_sensor.getNum(), bullet_sensor.isLoaded() ? "true" : "false",
                   bullet_sensor.magazineExist() ? "true" : "false");
 
-    mpu.updateYPR();
-    Serial.print("YPR:\t");
-    Serial.print(mpu.getYaw());
-    Serial.print("\t");
-    Serial.print(mpu.getPitch());
-    Serial.print("\t");
-    Serial.println(mpu.getRoll());
+    // mpu.updateYPR();
+    // Serial.print("YPR:\t");
+    // Serial.print(mpu.getYaw());
+    // Serial.print("\t");
+    // Serial.print(mpu.getPitch());
+    // Serial.print("\t");
+    // Serial.println(mpu.getRoll());
 }

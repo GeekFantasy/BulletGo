@@ -98,4 +98,10 @@
 #include "app/stability_training/stability_training.h"
 #endif
 
+// 运动状态数据服务
+#define APP_MOTION_STATE_SERVER_USE 1
+#if APP_MOTION_STATE_SERVER_USE
+#include "app/motion_state_server/motion_state_server.h"
+#endif
+
 #endif

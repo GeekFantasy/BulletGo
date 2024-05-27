@@ -1,8 +1,8 @@
-#ifndef APP_SERVER_H
-#define APP_SERVER_H
+#ifndef MOTION_STATE_SERVER_H
+#define MOTION_STATE_SERVER_H
 
 #include "sys/interface.h"
-#define MOTION_STATE_SERVER_APP_NAME "Motion State Server"
+#define SERVER_APP_NAME "WebServer"
 
 #ifdef ESP8266
 #include <ESP8266WiFi.h>      // Built-in
@@ -17,9 +17,9 @@ extern ESP8266WebServer server;
 #include <ESPmDNS.h>
 #include <DNSServer.h>
 #include <HTTPClient.h>
-extern WebServer server;
+extern WebServer motion_server;
 #endif
 
-extern APP_OBJ server_app;
+extern APP_OBJ motion_state_server_app;
 
 #endif

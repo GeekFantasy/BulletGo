@@ -1,0 +1,157 @@
+#include "motion_state_server.h"
+#include "motion_state_server_gui.h"
+#include "motion_state_web_setting.h"
+#include "sys/app_controller.h"
+#include "app/app_conf.h"
+#include "network.h"
+#include "common.h"
+
+#define SERVER_REFLUSH_INTERVAL 5000UL // 配置界面重新刷新时间(5s)
+#define DNS_PORT 53                    // DNS端口
+WebServer motion_server(80);
+
+// DNSServer dnsServer;
+
+struct ServerAppRunData
+{
+    boolean web_start;                    // 标志是否开启web server服务，0为关闭 1为开启
+    boolean req_sent;                     // 标志是否发送wifi请求服务，0为关闭 1为开启
+    unsigned long serverReflushPreMillis; // 上一回更新的时间
+};
+
+static ServerAppRunData *run_data = NULL;
+
+void start_motion_web_config()
+{
+    // 首页
+    motion_server.on("/motion-state", HTTP_GET, motion_data_api);
+
+    //init_motion_page_header();
+    //init_motion_page_footer();
+
+    motion_server.begin();
+    // MDNS.addService("http", "tcp", 80);
+    Serial.println("HTTP server started");
+
+    // dnsServer.start(DNS_PORT, "*", gateway);
+}
+
+void stop_motion_web_config()
+{
+    run_data->web_start = 0;
+    run_data->req_sent = 0;
+    motion_server.stop();
+    motion_server.close();
+}
+
+static int motion_server_init(AppController *sys)
+{
+    motion_server_gui_init();
+    // 初始化运行时参数
+    run_data = (ServerAppRunData *)malloc(sizeof(ServerAppRunData));
+    run_data->web_start = 0;
+    run_data->req_sent = 0;
+    run_data->serverReflushPreMillis = 0;
+    return 0;
+}
+
+static void motion_server_process(AppController *sys,
+                           const ImuAction *action,
+                           int btn_event)
+{
+    lv_scr_load_anim_t anim_type = LV_SCR_LOAD_ANIM_NONE;
+
+    if (RETURN == action->active)
+    {
+        stop_motion_web_config();
+        sys->app_exit();
+        return;
+    }
+
+    if (0 == run_data->web_start && 0 == run_data->req_sent)
+    {
+        // 预显示
+        display_motion_server_setting(
+            "Motion Server",
+            "Domain: holocubic",
+            "Wait...", "Wait...",
+            LV_SCR_LOAD_ANIM_NONE);
+        // 如果web服务没有开启 且 ap开启的请求没有发送 message这边没有作用（填0）
+        sys->send_to(MOTION_STATE_SERVER_APP_NAME, CTRL_NAME,
+                     APP_MESSAGE_WIFI_CONN, NULL, NULL);
+
+        run_data->req_sent = 1; // 标志为 ap开启请求已发送
+    }
+    else if (1 == run_data->web_start)
+    {
+        motion_server.handleClient(); // 一定需要放在循环里扫描
+        // dnsServer.processNextRequest();
+        if (doDelayMillisTime(SERVER_REFLUSH_INTERVAL, &run_data->serverReflushPreMillis, false) == true)
+        {
+            // 发送wifi维持的心跳
+            sys->send_to(MOTION_STATE_SERVER_APP_NAME, CTRL_NAME,
+                         APP_MESSAGE_WIFI_ALIVE, NULL, NULL);
+
+            display_motion_server_setting(
+                "Motion Server Start",
+                "Domain: holocubic",
+                WiFi.localIP().toString().c_str(),
+                WiFi.softAPIP().toString().c_str(),
+                LV_SCR_LOAD_ANIM_NONE);
+        }
+    }
+}
+
+static void motion_server_background_task(AppController *sys,
+                                   const ImuAction *act_info)
+{
+    // 本函数为后台任务，主控制器会间隔一分钟调用此函数
+    // 本函数尽量只调用"常驻数据",其他变量可能会因为生命周期的缘故已经释放
+}
+
+static int motion_server_exit_callback(void *param)
+{
+    motion_server_gui_del();
+
+    // 释放运行数据
+    if (NULL != run_data)
+    {
+        free(run_data);
+        run_data = NULL;
+    }
+    return 0;
+}
+
+static void motion_server_message_handle(const char *from, const char *to,
+                                  APP_MESSAGE_TYPE type, void *message,
+                                  void *ext_info)
+{
+    switch (type)
+    {
+    case APP_MESSAGE_WIFI_CONN:
+    //case APP_MESSAGE_WIFI_AP:
+    {
+        Serial.print(F("APP_MESSAGE_WIFI_CONN enable\n"));
+        display_motion_server_setting(
+            "Motion Server Start",
+            "Domain: holocubic",
+            WiFi.localIP().toString().c_str(),
+            WiFi.softAPIP().toString().c_str(),
+            LV_SCR_LOAD_ANIM_NONE);
+        start_motion_web_config();
+        run_data->web_start = 1;
+    }
+    break;
+    case APP_MESSAGE_WIFI_ALIVE:
+    {
+        // wifi心跳维持的响应 可以不做任何处理
+    }
+    break;
+    default:
+        break;
+    }
+}
+
+APP_OBJ motion_state_server_app = {MOTION_STATE_SERVER_APP_NAME, &app_motion_state_server, "",
+                      motion_server_init, motion_server_process, motion_server_background_task,
+                      motion_server_exit_callback, motion_server_message_handle};
