@@ -158,6 +158,7 @@ void loop()
         isCheckAction = false;
         act_info = mpu.getAction();
     }
+    
     ButtonEvent event = button.getEvent();
     app_controller->main_process(act_info, event); // 运行当前进程
 

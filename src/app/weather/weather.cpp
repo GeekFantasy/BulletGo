@@ -310,7 +310,7 @@ static void weather_process(AppController *sys,
 {
     lv_scr_load_anim_t anim_type = LV_SCR_LOAD_ANIM_NONE;
 
-    if (RETURN == act_info->active)
+    if (RETURN == act_info->active || 0 == btn_event)
     {
         sys->app_exit();
         return;

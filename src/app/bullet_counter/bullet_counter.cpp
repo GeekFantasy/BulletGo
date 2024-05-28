@@ -19,7 +19,7 @@ static void bullet_counter_process(AppController *sys,
                             const ImuAction *act_info,
                             int btn_event)
 {
-    if(0 == btn_event)
+    if(0 == btn_event) 
     {
         Serial.printf("Will exit the app. \n");
         sys->app_exit(); // 退出APP

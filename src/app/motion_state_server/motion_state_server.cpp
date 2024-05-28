@@ -36,7 +36,7 @@ static void motion_server_process(AppController *sys,
                            const ImuAction *action,
                            int btn_event)
 {
-    if (RETURN == action->active)
+    if (RETURN == action->active || 0 == btn_event)
     {
         run_data->web_start = 0;
         run_data->req_sent = 0;

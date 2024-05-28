@@ -59,6 +59,13 @@ struct ImuAction
     int16_t v_gz;
 };
 
+
+struct IMUData{
+    uint32_t     tick;         // 时间戳
+    float        ypr[3];       // 3轴姿态 yaw, pitch, roll
+    float        acc[3];       // 3轴加速度 x,y,z
+};
+
 class IMU
 {
 private:

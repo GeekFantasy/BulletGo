@@ -138,7 +138,7 @@ static void server_process(AppController *sys,
 {
     lv_scr_load_anim_t anim_type = LV_SCR_LOAD_ANIM_NONE;
 
-    if (RETURN == action->active)
+    if (RETURN == action->active || 0 == btn_event)
     {
         sys->send_to(SERVER_APP_NAME, CTRL_NAME, APP_MESSAGE_WIFI_DISCONN, NULL, NULL);
         stop_web_config();

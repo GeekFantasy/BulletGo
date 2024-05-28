@@ -91,7 +91,7 @@ static void game_2048_process(AppController *sys,
                               const ImuAction *act_info,
                               int btn_event)
 {
-    if (RETURN == act_info->active)
+    if (RETURN == act_info->active || 0 == btn_event)
     {
         sys->app_exit(); // 退出APP
         return;
