@@ -22,6 +22,8 @@ static bool isCheckAction = false;
 
 /*** Component objects **7*/
 ImuAction *act_info;           // 存放mpu6050返回的数据
+ImuAction tmp_action;          // 临时测试数据
+ButtonEvent btn_event;
 AppController *app_controller; // APP控制器
 
 TaskHandle_t handleTaskLvgl;
@@ -53,6 +55,8 @@ void imu_sensor_data_task(void *parameter)
 {
     // 在这里添加获取传感器数据的代码，例如读取传感器值并存储在 SensorData 结构体中
    IMUSensorData data;
+   TickType_t last_wake_time = xTaskGetTickCount();
+   const TickType_t frequency = 20;
    int i = 0;
     
     while (true) {
@@ -63,14 +67,14 @@ void imu_sensor_data_task(void *parameter)
 
         if(i >= 10)
         {
-            Serial.printf("Sensor Data->t:%d, y:%f, p: %f, r:%f, ax: %f, ay:%f, az:%f.\n", 
+            Serial.printf("SD->t:%d,y:%.2f,p:%.2f,r:%.2f,ax:%.2f,ay:%.2f,az:%.2f.\n", 
                         data.tick, data.ypr[0], data.ypr[1], data.ypr[2],
                         data.acc[0], data.acc[1], data.acc[2]);
             i = 0;
         }
         i++;
 
-        vTaskDelay(pdMS_TO_TICKS(20)); 
+        vTaskDelayUntil(&last_wake_time, frequency);; 
     }
 }
 
@@ -184,23 +188,20 @@ void loop()
         isCheckAction = false;
         act_info = mpu.getAction();
     }
-    
-    ButtonEvent event = button.getEvent();
-    app_controller->main_process(act_info, event); // 运行当前进程
+    btn_event = button.getEvent();
+    app_controller->main_process(act_info, btn_event); // 运行当前进程
 
     Serial.printf("Time: %d \n", GET_SYS_MILLIS());
-
     // Read button state
-    Serial.printf("Button State: %d, Event: %d \n", button.getState(), event);
+    Serial.printf("Button State: %d, Event: %d \n", button.getState(), btn_event);
 
     Serial.printf("Bullet Sensor, bullet cnt: %d, loaded: %s, mag exist: %s\n",
                   bullet_sensor.getNum(), bullet_sensor.isLoaded() ? "true" : "false",
                   bullet_sensor.magazineExist() ? "true" : "false");
-    ImuAction action;
-    mpu.getVirtureMotion6(&action);
-
-    Serial.printf("\tax = %d\tay = %d\taz = %d\n", action.v_ax, action.v_ay, action.v_az);
-    Serial.printf("\tax = %f\tay = %f\taz = %f\n", action.v_ax / 16384.0f * 9.8, action.v_ay / 16384.0f * 9.8, action.v_az / 16384.0f * 9.8);
+    
+    // mpu.getVirtureMotion6(&tmp_action);
+    // Serial.printf("\tax = %d\tay = %d\taz = %d\n", tmp_action.v_ax, tmp_action.v_ay, tmp_action.v_az);
+    // Serial.printf("\tax = %f\tay = %f\taz = %f\n", tmp_action.v_ax / 16384.0f * 9.8, tmp_action.v_ay / 16384.0f * 9.8, tmp_action.v_az / 16384.0f * 9.8);
     // mpu.updateYPR();
     // Serial.print("YPR:\t");
     // Serial.print(mpu.getYaw());
