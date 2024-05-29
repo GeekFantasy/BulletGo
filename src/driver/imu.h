@@ -7,6 +7,7 @@
 #include <list>
 #define ACTION_HISTORY_BUF_LEN 5
 #define INTERRUPT_PIN   25
+#define ACCEL_RANGE     2
 
 extern int32_t encoder_diff;
 extern lv_indev_state_t encoder_state;
@@ -59,11 +60,10 @@ struct ImuAction
     int16_t v_gz;
 };
 
-
-struct IMUData{
+struct IMUSensorData{
     uint32_t     tick;         // 时间戳
     float        ypr[3];       // 3轴姿态 yaw, pitch, roll
-    float        acc[3];       // 3轴加速度 x,y,z
+    float        acc[3];       // 3轴加速度 acc_x, acc_y, acc_z
 };
 
 class IMU
@@ -75,8 +75,11 @@ private:
     uint8_t order; // 表示方位，x与y是否对换
 
     float ypr[3]; // [yaw, pitch, roll]   yaw/pitch/roll container and gravity vector
+    float acc[3]; // [acc_x, acc_y, acc_z]
     int16_t temperature;
     bool dmpReady = false; // set true if DMP init was successful
+
+    SemaphoreHandle_t mutex;
 
 public:
     ImuAction action_info;
@@ -85,8 +88,12 @@ public:
     ACTIVE_TYPE act_info_history[ACTION_HISTORY_BUF_LEN];
     int act_info_history_ind; // 标志储存的位置
 
+private:
+    void getAccelFloat(float *acc_fl, int16_t* acc_i16);
+
 public:
     IMU();
+    ~IMU();
     void init(uint8_t order, uint8_t auto_calibration,
               SysMpuConfig *mpu_cfg);
     void setOrder(uint8_t order); // 设置方向
@@ -100,6 +107,7 @@ public:
     float getPitch();
     float getRoll();
     int16_t getTemperature();
+    IMUSensorData getSensorData();
 };
 
 #endif

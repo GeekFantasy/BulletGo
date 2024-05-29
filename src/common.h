@@ -14,6 +14,7 @@
 #include "driver/bullet_sensor.h"
 #include "driver/button.h"
 #include "network.h"
+#include "fixed_queue.h"
 
 // RGB
 #define RGB_LED_PIN 27
@@ -37,6 +38,7 @@ extern Pixel rgb;
 extern Network g_network;  // 网络连接
 extern FlashFS g_flashCfg; // flash中的文件系统（替代原先的Preferences）
 extern Display screen;     // 屏幕对象
+extern FixedQueue<IMUSensorData, 50> imu_data; //用于存储连续获取的 IMU Sensor Data，供其它任务使用
 
 boolean doDelayMillisTime(unsigned long interval,
                           unsigned long *previousMillis,

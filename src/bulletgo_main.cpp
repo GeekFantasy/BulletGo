@@ -49,6 +49,31 @@ void my_print(const char *buf)
     Serial.flush();
 }
 
+void imu_sensor_data_task(void *parameter)
+{
+    // 在这里添加获取传感器数据的代码，例如读取传感器值并存储在 SensorData 结构体中
+   IMUSensorData data;
+   int i = 0;
+    
+    while (true) {
+        // 模拟获取传感器数据
+        mpu.updateYPR();
+        data = mpu.getSensorData();
+        imu_data.push(data);
+
+        if(i >= 10)
+        {
+            Serial.printf("Sensor Data->t:%d, y:%f, p: %f, r:%f, ax: %f, ay:%f, az:%f.\n", 
+                        data.tick, data.ypr[0], data.ypr[1], data.ypr[2],
+                        data.acc[0], data.acc[1], data.acc[2]);
+            i = 0;
+        }
+        i++;
+
+        vTaskDelay(pdMS_TO_TICKS(20)); 
+    }
+}
+
 void setup()
 {
     Serial.begin(115200);
@@ -147,6 +172,7 @@ void setup()
                                 pdTRUE, (void *)0, actionCheckHandle);
     xTimerStart(xTimerAction, 0);
 
+    xTaskCreate(imu_sensor_data_task, "SensorDataTask", 4096, NULL, 1, NULL);
 }
 
 void loop()
@@ -170,7 +196,11 @@ void loop()
     Serial.printf("Bullet Sensor, bullet cnt: %d, loaded: %s, mag exist: %s\n",
                   bullet_sensor.getNum(), bullet_sensor.isLoaded() ? "true" : "false",
                   bullet_sensor.magazineExist() ? "true" : "false");
+    ImuAction action;
+    mpu.getVirtureMotion6(&action);
 
+    Serial.printf("\tax = %d\tay = %d\taz = %d\n", action.v_ax, action.v_ay, action.v_az);
+    Serial.printf("\tax = %f\tay = %f\taz = %f\n", action.v_ax / 16384.0f * 9.8, action.v_ay / 16384.0f * 9.8, action.v_az / 16384.0f * 9.8);
     // mpu.updateYPR();
     // Serial.print("YPR:\t");
     // Serial.print(mpu.getYaw());

@@ -10,6 +10,7 @@ Pixel rgb;
 Network g_network;  // 网络连接
 FlashFS g_flashCfg; // flash中的文件系统（替代原先的Preferences）
 Display screen;     // 屏幕对象
+FixedQueue<IMUSensorData, 50> imu_data; //用于存储连续获取的 IMU Sensor Data，供其它任务使用
 
 // lvgl handle的锁
 SemaphoreHandle_t lvgl_mutex = xSemaphoreCreateMutex();

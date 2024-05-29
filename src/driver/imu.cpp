@@ -25,6 +25,13 @@ IMU::IMU()
     }
     act_info_history_ind = ACTION_HISTORY_BUF_LEN - 1;
     this->order = 0; // 表示方位
+
+    mutex = xSemaphoreCreateMutex();
+}
+
+IMU::~IMU()
+{
+    vSemaphoreDelete(mutex);
 }
 
 void IMU::init(uint8_t order, uint8_t auto_calibration,
@@ -88,7 +95,7 @@ void IMU::init(uint8_t order, uint8_t auto_calibration,
         Serial.print(F("Enabling interrupt detection (Arduino external interrupt "));
         Serial.print(digitalPinToInterrupt(INTERRUPT_PIN));
         Serial.println(F(")..."));
-        //attachInterrupt(digitalPinToInterrupt(INTERRUPT_PIN), dmpDataReady, RISING);
+        // attachInterrupt(digitalPinToInterrupt(INTERRUPT_PIN), dmpDataReady, RISING);
         uint8_t mpuIntStatus = mpu.getIntStatus();
 
         // set our DMP Ready flag so the main loop() function knows it's okay to use it
@@ -106,7 +113,7 @@ void IMU::init(uint8_t order, uint8_t auto_calibration,
         Serial.println(F(")"));
     }
 
-    Serial.print(F("Initialization MPU6050 success.\n"));
+    Serial.printf("Initialization MPU6050 success. Accel Range: %d, Gyro Range: %d\n", mpu.getFullScaleAccelRange(), mpu.getFullScaleGyroRange());
 }
 
 void IMU::setOrder(uint8_t order) // 设置方向
@@ -297,9 +304,14 @@ ImuAction *IMU::getAction(void)
 
 void IMU::getVirtureMotion6(ImuAction *action_info)
 {
-    mpu.getMotion6(&(action_info->v_ax), &(action_info->v_ay),
-                   &(action_info->v_az), &(action_info->v_gx),
-                   &(action_info->v_gy), &(action_info->v_gz));
+    if (xSemaphoreTake(mutex, portMAX_DELAY) == pdTRUE)
+    {
+        mpu.getMotion6(&(action_info->v_ax), &(action_info->v_ay),
+                       &(action_info->v_az), &(action_info->v_gx),
+                       &(action_info->v_gy), &(action_info->v_gz));
+
+        xSemaphoreGive(mutex);
+    }
 
     if (order & X_DIR_TYPE)
     {
@@ -339,23 +351,40 @@ void IMU::updateYPR()
 
     // MPU control/status vars
     uint8_t fifoBuffer[64]; // FIFO storage buffer
+    int16_t acc_i16[3];
 
     // if programming failed, don't try to do anything
     if (!dmpReady)
         return;
 
-    // read a packet from FIFO
-    if (mpu.dmpGetCurrentFIFOPacket(fifoBuffer))
-    { 
-        mpu.dmpGetQuaternion(&q, fifoBuffer);
-        mpu.dmpGetGravity(&gravity, &q);
-        mpu.dmpGetYawPitchRoll(ypr, &q, &gravity);
+    if (xSemaphoreTake(mutex, portMAX_DELAY) == pdTRUE)
+    {
+        // read a packet from FIFO
+        if (mpu.dmpGetCurrentFIFOPacket(fifoBuffer))
+        {
+            mpu.dmpGetQuaternion(&q, fifoBuffer);
+            mpu.dmpGetGravity(&gravity, &q);
+            mpu.dmpGetYawPitchRoll(ypr, &q, &gravity);
+            mpu.dmpGetAccel(acc_i16, fifoBuffer);
+            getAccelFloat(acc, acc_i16);
+        }
+
+        xSemaphoreGive(mutex);
     }
 
     // read temperature
-    temperature = mpu.getTemperature();
+    // temperature = mpu.getTemperature();
 }
 
+void IMU::getAccelFloat(float *acc_fl, int16_t *acc_i16)
+{
+    if (NULL != acc_fl && NULL != acc_i16)
+    {
+        acc_fl[0] = acc_i16[0] / 16384.0f * 9.8 ;
+        acc_fl[1] = acc_i16[1] / 16384.0f * 9.8 ;
+        acc_fl[2] = acc_i16[2] / 16384.0f * 9.8 ;
+    }
+}
 
 float IMU::getYaw()
 {
@@ -375,4 +404,20 @@ float IMU::getRoll()
 int16_t IMU::getTemperature()
 {
     return temperature;
+}
+
+IMUSensorData IMU::getSensorData()
+{
+    IMUSensorData sensorData;
+    sensorData.tick = GET_SYS_MILLIS();
+
+    sensorData.ypr[0] = ypr[0] * 180 / M_PI;
+    sensorData.ypr[1] = ypr[1] * 180 / M_PI;
+    sensorData.ypr[2] = ypr[2] * 180 / M_PI;
+
+    sensorData.acc[0] = acc[0];
+    sensorData.acc[1] = acc[1];
+    sensorData.acc[2] = acc[2];
+
+    return sensorData;
 }
