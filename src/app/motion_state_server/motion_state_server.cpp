@@ -6,7 +6,7 @@
 #include "network.h"
 #include "common.h"
 
-#define SERVER_REFLUSH_INTERVAL 10000UL // 配置界面重新刷新时间(5s)
+#define SERVER_REFLUSH_INTERVAL 5000UL // 配置界面重新刷新时间(5s)
 #define DNS_PORT 53                    // DNS端口
 
 // DNSServer dnsServer;
@@ -36,7 +36,7 @@ static void motion_server_process(AppController *sys,
                            const ImuAction *action,
                            int btn_event)
 {
-    if (RETURN == action->active || 0 == btn_event)
+    if (0 == btn_event)
     {
         run_data->web_start = 0;
         run_data->req_sent = 0;
@@ -61,20 +61,18 @@ static void motion_server_process(AppController *sys,
     }
     else if (1 == run_data->web_start)
     {
+        uint32_t prior_tick = GET_SYS_MILLIS();
         motion_api_handle(); // 一定需要放在循环里扫描
-        // dnsServer.processNextRequest();
+        Serial.printf("Handle Client time: %d.\n", GET_SYS_MILLIS() - prior_tick);
+        delay(20);
+        
         if (doDelayMillisTime(SERVER_REFLUSH_INTERVAL, &run_data->serverReflushPreMillis, false) == true)
         {
             // 发送wifi维持的心跳
-            sys->send_to(MOTION_STATE_SERVER_APP_NAME, CTRL_NAME,
-                         APP_MESSAGE_WIFI_ALIVE, NULL, NULL);
+            sys->send_to(MOTION_STATE_SERVER_APP_NAME, CTRL_NAME, APP_MESSAGE_WIFI_ALIVE, NULL, NULL);
 
-            display_motion_server_setting(
-                "Motion Server Start",
-                "Domain: holocubic",
-                WiFi.localIP().toString().c_str(),
-                WiFi.softAPIP().toString().c_str(),
-                LV_SCR_LOAD_ANIM_NONE);
+            display_motion_server_setting("Motion Server Start","Domain: holocubic",
+                WiFi.localIP().toString().c_str(), WiFi.softAPIP().toString().c_str(), LV_SCR_LOAD_ANIM_NONE);
         }
     }
 }

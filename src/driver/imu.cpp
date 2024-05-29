@@ -214,8 +214,8 @@ ImuAction *IMU::getAction(void)
     ImuAction tmp_info;
     getVirtureMotion6(&tmp_info);
 
-    // Serial.printf("gx = %d\tgy = %d\tgz = %d", tmp_info.v_gx, tmp_info.v_gy, tmp_info.v_gz);
-    // Serial.printf("\tax = %d\tay = %d\taz = %d\n", tmp_info.v_ax, tmp_info.v_ay, tmp_info.v_az);
+    Serial.printf("gx = %d\tgy = %d\tgz = %d", tmp_info.v_gx, tmp_info.v_gy, tmp_info.v_gz);
+    Serial.printf("\tax = %d\tay = %d\taz = %d\n", tmp_info.v_ax, tmp_info.v_ay, tmp_info.v_az);
 
     tmp_info.active = ACTIVE_TYPE::UNKNOWN;
 
@@ -312,7 +312,7 @@ void IMU::getVirtureMotion6(ImuAction *action_info)
 
         xSemaphoreGive(mutex);
     }
-
+    
     if (order & X_DIR_TYPE)
     {
         action_info->v_ax = -action_info->v_ax;
@@ -380,9 +380,9 @@ void IMU::getAccelFloat(float *acc_fl, int16_t *acc_i16)
 {
     if (NULL != acc_fl && NULL != acc_i16)
     {
-        acc_fl[0] = acc_i16[0] / 16384.0f * 9.8 ;
-        acc_fl[1] = acc_i16[1] / 16384.0f * 9.8 ;
-        acc_fl[2] = acc_i16[2] / 16384.0f * 9.8 ;
+        acc_fl[0] = acc_i16[0] / 16384.0f * 9.8;
+        acc_fl[1] = acc_i16[1] / 16384.0f * 9.8;
+        acc_fl[2] = acc_i16[2] / 16384.0f * 9.8;
     }
 }
 
