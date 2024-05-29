@@ -422,9 +422,10 @@ IMUSensorData IMU::getSensorData()
     sensorData.ypr[1] = ypr[1] * 180 / M_PI;
     sensorData.ypr[2] = ypr[2] * 180 / M_PI;
 
-    sensorData.acc[0] = acc[0];
-    sensorData.acc[1] = acc[1];
-    sensorData.acc[2] = acc[2];
+    // The accel data from DMP is half of the normal value, so multipling 2 for a workaround
+    sensorData.acc[0] = acc[0] * 2;  
+    sensorData.acc[1] = acc[1] * 2;
+    sensorData.acc[2] = acc[2] * 2;
 
     return sensorData;
 }

@@ -104,7 +104,7 @@ static void motion_server_message_handle(const char *from, const char *to,
     switch (type)
     {
     case APP_MESSAGE_WIFI_CONN:
-    //case APP_MESSAGE_WIFI_AP:
+    case APP_MESSAGE_WIFI_AP:
     {
         Serial.print(F("APP_MESSAGE_WIFI_CONN enable\n"));
         display_motion_server_setting(
