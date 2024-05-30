@@ -1,5 +1,5 @@
-#ifndef FIRING_STABILITY_H
-#define FIRING_STABILITY_H
+#ifndef STABILITY_H
+#define STABILITY_H
 
 #include <Arduino.h>
 #include <freertos/FreeRTOS.h>

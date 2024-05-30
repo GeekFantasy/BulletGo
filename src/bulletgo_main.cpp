@@ -10,7 +10,6 @@
 
 #include "common.h"
 #include "sys/app_controller.h"
-
 #include "app/app_conf.h"
 
 #include <SPIFFS.h>
@@ -67,9 +66,9 @@ void imu_sensor_data_task(void *parameter)
 
         if (i >= 10)
         {
-            Serial.printf("SD->t:%d,y:%.2f,p:%.2f,r:%.2f,ax:%.2f,ay:%.2f,az:%.2f.\n",
-                          data.tick, data.ypr[0], data.ypr[1], data.ypr[2],
-                          data.acc[0], data.acc[1], data.acc[2]);
+            // Serial.printf("SD->t:%d,y:%.2f,p:%.2f,r:%.2f,ax:%.2f,ay:%.2f,az:%.2f.\n",
+            //               data.tick, data.ypr[0], data.ypr[1], data.ypr[2],
+            //               data.acc[0], data.acc[1], data.acc[2]);
             i = 0;
         }
         i++;
@@ -126,6 +125,10 @@ void setup()
     // 将APP"安装"到controller里
 #if APP_BULLET_COUNTER_USE
     app_controller->app_install(&bullet_counter_app);
+#endif
+
+#if APP_FIRING_STABILIT_USE
+    app_controller->app_install(&firing_stability_app);
 #endif
 
 #if APP_STABILITY_TRAINING_USE
@@ -197,8 +200,8 @@ void loop()
                   bullet_sensor.getNum(), bullet_sensor.isLoaded() ? "true" : "false",
                   bullet_sensor.magazineExist() ? "true" : "false");
 
-    mpu.getVirtureMotion6(&tmp_action);
-    Serial.printf("\tax = %d\tay = %d\taz = %d\n", tmp_action.v_ax, tmp_action.v_ay, tmp_action.v_az);
+    // mpu.getVirtureMotion6(&tmp_action);
+    // Serial.printf("\tax = %d\tay = %d\taz = %d\n", tmp_action.v_ax, tmp_action.v_ay, tmp_action.v_az);
     // Serial.printf("\tax = %f\tay = %f\taz = %f\n", tmp_action.v_ax / 16384.0f * 9.8, tmp_action.v_ay / 16384.0f * 9.8, tmp_action.v_az / 16384.0f * 9.8);
     // mpu.updateYPR();
     // Serial.print("YPR:\t");

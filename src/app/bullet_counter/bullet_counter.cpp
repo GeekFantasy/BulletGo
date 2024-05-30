@@ -43,7 +43,7 @@ static void bullet_counter_process(AppController *sys,
         return;
     }
 
-    Serial.printf("Display bullet status. \n");
+    //Serial.printf("Display bullet status. \n");
 
     bullet_cnt = bullet_sensor.getNum();
     is_loaded = bullet_sensor.isLoaded();
@@ -51,14 +51,15 @@ static void bullet_counter_process(AppController *sys,
 
     if(inter_triggered)
     {
-        inter_triggered = false;
         if(is_loaded_prior && !is_loaded)
         {
             need_record_motion = true;
             motion_trigger_time = inter_triggered_time;
             motion_record_time = inter_triggered_time + TRIGGER_MOTION_RECORD_TIME;
-            Serial.printf("***Need to record motion at %d***. \n", motion_record_time);
+            Serial.printf("********************Need to record motion at %d**************************. \n", motion_record_time);
         }
+        
+        inter_triggered = false;
     }
 
     is_loaded_prior = is_loaded;
@@ -81,7 +82,7 @@ static void bullet_counter_process(AppController *sys,
         fire_stab_data.push(fs);
 
         need_record_motion = false;
-        Serial.printf("***One motion data was recored %d. ***\n", motion_trigger_time);
+        Serial.printf("***One motion data was recored %d. fire_stab_data.size: %d ***\n", motion_trigger_time, fire_stab_data.size());
     }
 }
 

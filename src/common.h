@@ -15,7 +15,7 @@
 #include "driver/button.h"
 #include "network.h"
 #include "fixed_queue.h"
-#include "firing_stability.h"
+#include "stability_data.h"
 
 // RGB
 #define RGB_LED_PIN 27
