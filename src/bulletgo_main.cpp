@@ -78,6 +78,7 @@ void imu_sensor_data_task(void *parameter)
     }
 }
 
+
 void setup()
 {
     Serial.begin(115200);
@@ -170,9 +171,7 @@ void setup()
     act_info = mpu.getAction();
 
     // 定义一个mpu6050的动作检测定时器
-    xTimerAction = xTimerCreate("Action Check",
-                                200 / portTICK_PERIOD_MS,
-                                pdTRUE, (void *)0, actionCheckHandle);
+    xTimerAction = xTimerCreate("Action Check", 200 / portTICK_PERIOD_MS, pdTRUE, (void *)0, actionCheckHandle);
     xTimerStart(xTimerAction, 0);
 
     xTaskCreate(imu_sensor_data_task, "SensorDataTask", 4096, NULL, 1, NULL);
@@ -192,14 +191,14 @@ void loop()
 
     Serial.printf("Time: %d \n", GET_SYS_MILLIS());
     // Read button state
-    // Serial.printf("Button State: %d, Event: %d \n", button.getState(), btn_event);
+    Serial.printf("Button State: %d, Event: %d \n", button.getState(), btn_event);
 
-    // Serial.printf("Bullet Sensor, bullet cnt: %d, loaded: %s, mag exist: %s\n",
-    //               bullet_sensor.getNum(), bullet_sensor.isLoaded() ? "true" : "false",
-    //               bullet_sensor.magazineExist() ? "true" : "false");
+    Serial.printf("Bullet Sensor, bullet cnt: %d, loaded: %s, mag exist: %s\n",
+                  bullet_sensor.getNum(), bullet_sensor.isLoaded() ? "true" : "false",
+                  bullet_sensor.magazineExist() ? "true" : "false");
 
-    // mpu.getVirtureMotion6(&tmp_action);
-    // Serial.printf("\tax = %d\tay = %d\taz = %d\n", tmp_action.v_ax, tmp_action.v_ay, tmp_action.v_az);
+    mpu.getVirtureMotion6(&tmp_action);
+    Serial.printf("\tax = %d\tay = %d\taz = %d\n", tmp_action.v_ax, tmp_action.v_ay, tmp_action.v_az);
     // Serial.printf("\tax = %f\tay = %f\taz = %f\n", tmp_action.v_ax / 16384.0f * 9.8, tmp_action.v_ay / 16384.0f * 9.8, tmp_action.v_az / 16384.0f * 9.8);
     // mpu.updateYPR();
     // Serial.print("YPR:\t");

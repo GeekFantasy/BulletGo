@@ -14,6 +14,17 @@ void BulletSensor::init()
     sensor_data[0] = 0x0F;
 }
 
+void BulletSensor::initInterrupt(void (*isr)())
+{
+    pinMode(BULLET_SENSOR_INT_PIN, INPUT_PULLUP);
+    attachInterrupt(digitalPinToInterrupt(BULLET_SENSOR_INT_PIN), isr, FALLING);
+}
+
+void BulletSensor::cancelInterrupt()
+{
+     detachInterrupt(digitalPinToInterrupt(BULLET_SENSOR_INT_PIN));
+}
+
 bool BulletSensor::getSensorData()
 {
     uint8_t data[1];

@@ -5,13 +5,30 @@
 #include "common.h"
 
 #define BULLET_COUNTER_APP_NAME "Bullet Counter"
-
 #define BULLET_COUNTER_CONFIG_PATH "/bulletcounter.cfg"
+#define TRIGGER_MOTION_RECORD_TIME 400   // 子弹发射后，多长时间开始采集 IMU的数据
+
+static int bullet_cnt = 0;
+static bool is_loaded_prior = false;
+static bool is_loaded = false;
+static bool magazine_exist = false;
+static bool inter_triggered = false;
+static uint32_t inter_triggered_time = 0;
+static bool need_record_motion = false;
+static uint32_t motion_trigger_time = 0;
+static uint32_t motion_record_time = 0;
+
+void IRAM_ATTR handle_bulletsensor_inter() 
+{
+    inter_triggered = true;
+    inter_triggered_time = xTaskGetTickCount();
+}
 
 static int bullet_counter_init(AppController *sys)
 {
     tft->setSwapBytes(true);
     bullet_counter_gui_init();
+    bullet_sensor.initInterrupt(handle_bulletsensor_inter);
     return 0;
 }
 
@@ -27,8 +44,45 @@ static void bullet_counter_process(AppController *sys,
     }
 
     Serial.printf("Display bullet status. \n");
-    //display_bullet_status(bullet_sensor.getNum(), bullet_sensor.isLoaded());
-    display_bullet_status_v2(bullet_sensor.getNum(), bullet_sensor.isLoaded(), bullet_sensor.magazineExist());
+
+    bullet_cnt = bullet_sensor.getNum();
+    is_loaded = bullet_sensor.isLoaded();
+    magazine_exist = bullet_sensor.magazineExist();
+
+    if(inter_triggered)
+    {
+        inter_triggered = false;
+        if(is_loaded_prior && !is_loaded)
+        {
+            need_record_motion = true;
+            motion_trigger_time = inter_triggered_time;
+            motion_record_time = inter_triggered_time + TRIGGER_MOTION_RECORD_TIME;
+            Serial.printf("***Need to record motion at %d***. \n", motion_record_time);
+        }
+    }
+
+    is_loaded_prior = is_loaded;
+    display_bullet_status_v2(bullet_cnt, is_loaded, magazine_exist);
+
+    if(need_record_motion && (xTaskGetTickCount() > motion_record_time))
+    {
+        IMUSensorData data[50];
+        FiringStability fs;
+
+        int size = imu_data.getAllData(data, sizeof(data));
+        fs.trigger_time = motion_trigger_time;
+
+        for (size_t i = 0; i < size; i++)
+        {
+            fs.stability_data[i].ypr[0] = data[i].ypr[0];
+            fs.stability_data[i].ypr[1] = data[i].ypr[1];
+            fs.stability_data[i].ypr[2] = data[i].ypr[2];
+        }
+        fire_stab_data.push(fs);
+
+        need_record_motion = false;
+        Serial.printf("***One motion data was recored %d. ***\n", motion_trigger_time);
+    }
 }
 
 static void bullet_counter_background_task(AppController *sys,
@@ -40,6 +94,7 @@ static void bullet_counter_background_task(AppController *sys,
 static int bullet_counter_exit_callback(void *param)
 {
     bullet_counter_gui_del();
+    bullet_sensor.cancelInterrupt();
     return 0;
 }
 

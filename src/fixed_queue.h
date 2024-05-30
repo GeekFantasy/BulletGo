@@ -26,7 +26,7 @@ public:
         vSemaphoreDelete(mutex);
     }
 
-    bool push(const T &item)
+    bool push(const T item)
     {
         if (xSemaphoreTake(mutex, portMAX_DELAY) == pdTRUE)
         {
