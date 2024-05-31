@@ -23,14 +23,14 @@ void firing_stability_gui_init(int16_t aver_x, int16_t aver_y)
 
     chart = lv_chart_create(scr_stability);
     lv_obj_set_size(chart, 200, 150);
-    //lv_chart_set_point_count(chart, 50);
-    //lv_chart_set_type(chart, LV_CHART_TYPE_LINE);
+    lv_chart_set_point_count(chart, 50);
+    lv_chart_set_type(chart, LV_CHART_TYPE_LINE);
     lv_obj_center(chart);
 
     lv_chart_set_range(chart, LV_CHART_AXIS_PRIMARY_Y, aver_x - 1000, aver_x + 1000);   // 第一组数据的范围
     lv_chart_set_range(chart, LV_CHART_AXIS_SECONDARY_Y, aver_y - 1000, aver_y + 1000); // 第二组数据的范围
-    lv_chart_series_t *ser_acc_x = lv_chart_add_series(chart, lv_palette_main(LV_PALETTE_RED), LV_CHART_AXIS_PRIMARY_Y);
-    lv_chart_series_t *ser_acc_y = lv_chart_add_series(chart, lv_palette_main(LV_PALETTE_BLUE), LV_CHART_AXIS_SECONDARY_Y);
+    ser_acc_x = lv_chart_add_series(chart, lv_palette_main(LV_PALETTE_RED), LV_CHART_AXIS_PRIMARY_Y);
+    ser_acc_y = lv_chart_add_series(chart, lv_palette_main(LV_PALETTE_BLUE), LV_CHART_AXIS_SECONDARY_Y);
 
     lv_scr_load(scr_stability);
 }

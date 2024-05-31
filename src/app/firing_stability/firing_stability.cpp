@@ -56,6 +56,7 @@ static void firing_stability_process(AppController *sys,
         sys->app_exit(); // 退出APP
         return;
     }
+
     Serial.printf("Begin to add data.\n");
     if (update_cnt < 50)
     {
