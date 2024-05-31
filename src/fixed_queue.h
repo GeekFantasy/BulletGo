@@ -57,6 +57,8 @@ public:
             if (numElements > 0)
             {
                 size_t lastIndex = (tail == 0) ? (N - 1) : (tail - 1);
+                
+                xSemaphoreGive(mutex);
                 return arr[lastIndex];
             }
 
