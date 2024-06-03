@@ -1,7 +1,8 @@
 #ifndef BUTTON_H
 #define BUTTON_H
 
-#define BUTTON_PIN  35
+//#define BUTTON_PIN  35   // verison 2.1 
+#define BUTTON_PIN  22   // verison 1.0 
 
 enum BUTTON_STATE
 {

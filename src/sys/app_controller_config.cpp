@@ -582,7 +582,7 @@ void AppController::write_data(const FixedQueue<FiringStability, 5> &fs_data)
     {
         FiringStability fs = fs_data.getIndex(i);
         serializeFiringStability(fs, fire_stab_files[i]);
-        Serial.printf("Write file no. %d to file %s. \n", size, fire_stab_files[i]);
+        Serial.printf("Write file no. %d to file %s. \n", i, fire_stab_files[i]);
     }
 }
 
