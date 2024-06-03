@@ -39,7 +39,7 @@ static int firing_stability_init(AppController *sys)
 
         tft->setSwapBytes(true);
         Serial.printf("Start to gui init. aver_x: %d, aver_y : %d\n", aver_x, aver_y);
-        firing_stability_gui_init(aver_x, aver_y);
+        firing_stability_gui_init(aver_x, aver_y, 1, 100);
         Serial.printf("Finished to gui init.\n");
         update_cnt = 0;
         ui_initialed = true;

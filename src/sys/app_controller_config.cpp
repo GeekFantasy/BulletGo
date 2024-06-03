@@ -487,10 +487,10 @@ void serializeFiringStability(const FiringStability &data, const char *filename)
         }
     }
 
-    // 打印JSON文档内容
-    Serial.println("Serialized JSON document:");
-    serializeJsonPretty(doc, Serial);
-    Serial.println();
+    // // 打印JSON文档内容
+    // Serial.println("Serialized JSON document:");
+    // serializeJsonPretty(doc, Serial);
+    // Serial.println();
 
     // 获取并打印内存占用
     size_t usedMemory = doc.memoryUsage();
@@ -540,10 +540,10 @@ bool deserializeFiringStability(FiringStability &data, const char *filename)
         return false;
     }
 
-    // 打印反序列化后的JSON文档内容
-    Serial.println("Deserialized JSON document:");
-    serializeJsonPretty(doc, Serial);
-    Serial.println();
+    // // 打印反序列化后的JSON文档内容
+    // Serial.println("Deserialized JSON document:");
+    // serializeJsonPretty(doc, Serial);
+    // Serial.println();
 
     // 获取并打印内存占用
     size_t usedMemory = doc.memoryUsage();
