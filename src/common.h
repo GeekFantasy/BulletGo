@@ -30,6 +30,8 @@
 #define IMU_I2C_SDA 32
 #define IMU_I2C_SCL 33
 
+#define FIRING_STAB_DATA_SIZE 5
+
 extern IMU mpu; // 原则上只提供给主程序调用
 extern BulletSensor bullet_sensor;
 extern Button button;

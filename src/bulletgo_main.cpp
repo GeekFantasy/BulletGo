@@ -105,6 +105,7 @@ void setup()
     app_controller->read_config(&app_controller->sys_cfg);
     app_controller->read_config(&app_controller->mpu_cfg);
     app_controller->read_config(&app_controller->rgb_cfg);
+    app_controller->read_data(fire_stab_data);
 
     /*** Init screen ***/
     app_controller->sys_cfg.rotation = 0; // Force the rotaion to 2

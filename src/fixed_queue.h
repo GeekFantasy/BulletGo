@@ -121,6 +121,24 @@ public:
             return 0; // 获取互斥锁失败
         }
     }
+
+    T getIndex(size_t index) const
+    {
+       if (xSemaphoreTake(mutex, portMAX_DELAY) == pdTRUE)
+        {
+            if (index < numElements)
+            {
+                size_t index = (head + index) % N;
+                
+                xSemaphoreGive(mutex);
+                return arr[index];
+            }
+
+            xSemaphoreGive(mutex);
+        }
+
+        return T(); // 队列为空，返回默认值
+    }
 };
 
 #endif

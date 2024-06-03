@@ -60,6 +60,7 @@ static void bullet_counter_process(AppController *sys,
         }
         
         inter_triggered = false;
+
     }
 
     is_loaded_prior = is_loaded;
@@ -71,18 +72,21 @@ static void bullet_counter_process(AppController *sys,
         FiringStability fs;
 
         int size = imu_data.getAllData(data, sizeof(data));
-        fs.trigger_time = motion_trigger_time;
+        fs.trig_time = motion_trigger_time;
 
         for (size_t i = 0; i < size; i++)
         {
-            fs.stability_data[i].ypr[0] = data[i].ypr[0];
-            fs.stability_data[i].ypr[1] = data[i].ypr[1];
-            fs.stability_data[i].ypr[2] = data[i].ypr[2];
+            fs.motions[i].tick = data[i].tick;
+            fs.motions[i].ypr[0] = data[i].ypr[0];
+            fs.motions[i].ypr[1] = data[i].ypr[1];
+            fs.motions[i].ypr[2] = data[i].ypr[2];
         }
         fire_stab_data.push(fs);
 
         need_record_motion = false;
         Serial.printf("***One motion data was recored %d. fire_stab_data.size: %d ***\n", motion_trigger_time, fire_stab_data.size());
+
+        sys->send_to(BULLET_COUNTER_APP_NAME, CTRL_NAME, APP_MESSAGE_WRITE_DATA, NULL, NULL);
     }
 }
 

@@ -27,8 +27,8 @@ void firing_stability_gui_init(int16_t aver_x, int16_t aver_y)
     lv_chart_set_type(chart, LV_CHART_TYPE_LINE);
     lv_obj_center(chart);
 
-    lv_chart_set_range(chart, LV_CHART_AXIS_PRIMARY_Y, aver_x - 1000, aver_x + 1000);   // 第一组数据的范围
-    lv_chart_set_range(chart, LV_CHART_AXIS_SECONDARY_Y, aver_y - 1000, aver_y + 1000); // 第二组数据的范围
+    lv_chart_set_range(chart, LV_CHART_AXIS_PRIMARY_Y, aver_x - 250, aver_x + 250);   // 第一组数据的范围
+    lv_chart_set_range(chart, LV_CHART_AXIS_SECONDARY_Y, aver_y - 250, aver_y + 250); // 第二组数据的范围
     ser_acc_x = lv_chart_add_series(chart, lv_palette_main(LV_PALETTE_RED), LV_CHART_AXIS_PRIMARY_Y);
     ser_acc_y = lv_chart_add_series(chart, lv_palette_main(LV_PALETTE_BLUE), LV_CHART_AXIS_SECONDARY_Y);
 

@@ -2,10 +2,23 @@
 #include "common.h"
 #include "interface.h"
 #include "Arduino.h"
+#include <ArduinoJson.h>
 
 #define APP_CTRL_CONFIG_PATH "/sys.cfg"
 #define MPU_CONFIG_PATH "/mpu.cfg"
 #define RGB_CONFIG_PATH "/rgb.cfg"
+#define FIRING_STABILITY_FILE1_PATH "/fs1.data"
+#define FIRING_STABILITY_FILE2_PATH "/fs2.data"
+#define FIRING_STABILITY_FILE3_PATH "/fs3.data"
+#define FIRING_STABILITY_FILE4_PATH "/fs4.data"
+#define FIRING_STABILITY_FILE5_PATH "/fs5.data"
+
+const char *fire_stab_files[FIRING_STAB_DATA_SIZE] = {
+    FIRING_STABILITY_FILE1_PATH,
+    FIRING_STABILITY_FILE2_PATH,
+    FIRING_STABILITY_FILE3_PATH,
+    FIRING_STABILITY_FILE4_PATH,
+    FIRING_STABILITY_FILE5_PATH};
 
 void AppController::read_config(SysUtilConfig *cfg)
 {
@@ -14,7 +27,7 @@ void AppController::read_config(SysUtilConfig *cfg)
     char info[128] = {0};
     uint16_t size = g_flashCfg.readFile(APP_CTRL_CONFIG_PATH, (uint8_t *)info);
     info[size] = 0;
-    
+
     if (size == 0)
     {
         // 默认值
@@ -32,7 +45,7 @@ void AppController::read_config(SysUtilConfig *cfg)
         char *param[12] = {0};
         analyseParam(info, 12, param);
         // Force the rotation to 2, normal direction.
-        //param[8][0] = '2' ,param[8][0] = 0;
+        // param[8][0] = '2' ,param[8][0] = 0;
         cfg->ssid_0 = param[0];
         cfg->password_0 = param[1];
         cfg->ssid_1 = param[2];
@@ -84,9 +97,9 @@ void AppController::write_config(SysUtilConfig *cfg)
     g_flashCfg.writeFile(APP_CTRL_CONFIG_PATH, w_data.c_str());
 
     // 立即生效相关配置
-    //screen.setBackLight(cfg->backLight / 100.0);
-    //tft->setRotation(cfg->rotation);
-    //mpu.setOrder(cfg->mpu_order);
+    // screen.setBackLight(cfg->backLight / 100.0);
+    // tft->setRotation(cfg->rotation);
+    // mpu.setOrder(cfg->mpu_order);
 }
 
 void AppController::read_config(SysMpuConfig *cfg)
@@ -442,7 +455,145 @@ void AppController::deal_config(APP_MESSAGE_TYPE type,
         write_config(&rgb_cfg);
     }
     break;
+    case APP_MESSAGE_WRITE_DATA:
+    {
+        write_data(fire_stab_data);
+    }
+    break;
     default:
         break;
+    }
+}
+
+void serializeFiringStability(const FiringStability &data, const char *filename)
+{
+    // 创建一个JSON文档
+    DynamicJsonDocument doc(6000); // 动态分配内存以适应文档大小
+
+    // 创建根对象
+    JsonObject obj = doc.to<JsonObject>();
+    obj["trig_time"] = data.trig_time;
+
+    JsonArray motionsArray = obj.createNestedArray("motions");
+    for (size_t j = 0; j < 50; ++j)
+    {
+        JsonObject motionObj = motionsArray.createNestedObject();
+        motionObj["tick"] = data.motions[j].tick;
+
+        JsonArray yprArray = motionObj.createNestedArray("ypr");
+        for (size_t k = 0; k < 3; ++k)
+        {
+            yprArray.add(data.motions[j].ypr[k]);
+        }
+    }
+
+    // 打印JSON文档内容
+    Serial.println("Serialized JSON document:");
+    serializeJsonPretty(doc, Serial);
+    Serial.println();
+
+    // 获取并打印内存占用
+    size_t usedMemory = doc.memoryUsage();
+    Serial.print("Memory Usage for Serialization: ");
+    Serial.print(usedMemory);
+    Serial.println(" bytes");
+
+    // 获取并打印JSON文档长度
+    size_t jsonLength = measureJson(doc);
+    Serial.print("JSON Document Length: ");
+    Serial.print(jsonLength);
+    Serial.println(" bytes");
+
+    // 打开文件以进行写操作
+    File file = SPIFFS.open(filename, FILE_WRITE);
+    if (!file)
+    {
+        Serial.println("Failed to open file for writing");
+        return;
+    }
+
+    // 序列化JSON文档到文件
+    serializeJson(doc, file);
+    file.close();
+}
+
+// 反序列化函数
+bool deserializeFiringStability(FiringStability &data, const char *filename)
+{
+    // 打开文件以进行读操作
+    File file = SPIFFS.open(filename, FILE_READ);
+    if (!file)
+    {
+        Serial.println("Failed to open file for reading");
+        return false;
+    }
+
+    Serial.printf("The size of %s is %d. \n", filename, file.size());
+
+    // 创建一个JSON文档
+    DynamicJsonDocument doc(6000); // 动态分配内存以适应文档大小
+    DeserializationError error = deserializeJson(doc, file);
+    if (error)
+    {
+        Serial.print("Failed to read file, using default configuration: ");
+        Serial.println(error.c_str());
+        return false;
+    }
+
+    // 打印反序列化后的JSON文档内容
+    Serial.println("Deserialized JSON document:");
+    serializeJsonPretty(doc, Serial);
+    Serial.println();
+
+    // 获取并打印内存占用
+    size_t usedMemory = doc.memoryUsage();
+    Serial.print("Memory Usage for Deserialization: ");
+    Serial.print(usedMemory);
+    Serial.println(" bytes");
+
+
+    // 反序列化对象
+    JsonObject obj = doc.as<JsonObject>();
+    data.trig_time = obj["trig_time"];
+
+    JsonArray motionsArray = obj["motions"];
+    size_t j = 0;
+    for (JsonObject motionObj : motionsArray)
+    {
+        data.motions[j].tick = motionObj["tick"];
+        JsonArray yprArray = motionObj["ypr"];
+        for (size_t k = 0; k < 3; ++k)
+        {
+            data.motions[j].ypr[k] = yprArray[k];
+        }
+        j++;
+    }
+
+    file.close();
+    Serial.printf("Suceed to deserial obj from %s. \n", filename);
+    return true;
+}
+
+void AppController::write_data(const FixedQueue<FiringStability, 5> &fs_data)
+{
+    int size = fs_data.size();
+
+    for (int i = 0; i < size; ++i)
+    {
+        FiringStability fs = fs_data.getIndex(i);
+        serializeFiringStability(fs, fire_stab_files[i]);
+        Serial.printf("Write file no. %d to file %s. \n", size, fire_stab_files[i]);
+    }
+}
+
+void AppController::read_data(FixedQueue<FiringStability, 5> &fs_data)
+{
+    for (size_t i = 0; i < FIRING_STAB_DATA_SIZE; i++)
+    {
+        FiringStability fs;
+        if(deserializeFiringStability(fs, fire_stab_files[i]))
+        {
+            fs_data.push(fs);
+        }
     }
 }

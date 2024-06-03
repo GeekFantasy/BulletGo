@@ -8,7 +8,8 @@
 #define FIRING_STABILITY_CONFIG_PATH "/firingstability.cfg"
 FiringStability stab_data;
 
-int update_cnt = 0;
+static int update_cnt = 0;
+static bool ui_initialed = false;
 
 static void get_average_data(FiringStability &sd, int16_t *aver_x, int16_t *aver_y)
 {
@@ -18,8 +19,8 @@ static void get_average_data(FiringStability &sd, int16_t *aver_x, int16_t *aver
 
     for (i = 0; i < 50; i++)
     {
-        sum_x += sd.stability_data[i].ypr[0] * 100;
-        sum_y += sd.stability_data[i].ypr[1] * 100;
+        sum_x += sd.motions[i].ypr[0] * 100;
+        sum_y += sd.motions[i].ypr[1] * 100;
     }
 
     *aver_x = sum_x / 50;
@@ -28,21 +29,22 @@ static void get_average_data(FiringStability &sd, int16_t *aver_x, int16_t *aver
 
 static int firing_stability_init(AppController *sys)
 {
-    int16_t aver_x = 0, aver_y = 0;
-
     if (fire_stab_data.size() > 0)
     {
+        int16_t aver_x = 0, aver_y = 0;
+
         Serial.printf("fire_stab_data.size() = %d \n", fire_stab_data.size());
         stab_data = fire_stab_data.getLast();
         get_average_data(stab_data, &aver_x, &aver_y);
+
+        tft->setSwapBytes(true);
+        Serial.printf("Start to gui init. aver_x: %d, aver_y : %d\n", aver_x, aver_y);
+        firing_stability_gui_init(aver_x, aver_y);
+        Serial.printf("Finished to gui init.\n");
+        update_cnt = 0;
+        ui_initialed = true;
     }
 
-    tft->setSwapBytes(true);
-    
-    Serial.printf("Start to gui init. aver_x: %d, aver_y : %d\n", aver_x, aver_y);
-    firing_stability_gui_init(aver_x, aver_y);
-    Serial.printf("Finished to gui init.\n");
-    update_cnt = 0;
     return 0;
 }
 
@@ -57,14 +59,17 @@ static void firing_stability_process(AppController *sys,
         return;
     }
 
-    Serial.printf("Begin to add data.\n");
-    if (update_cnt < 50)
+    if (ui_initialed)
     {
-        firing_stability_gui_update(stab_data.stability_data[update_cnt].ypr[0] * 100,  stab_data.stability_data[update_cnt].ypr[1] * 100);
-        Serial.printf("*********Succeed to add one data, x: %f, y: %f *********.\n", 
-                        stab_data.stability_data[update_cnt].ypr[0] ,
-                        stab_data.stability_data[update_cnt].ypr[1]);
-        update_cnt++;
+        Serial.printf("Begin to add data.\n");
+        if (update_cnt < 50)
+        {
+            firing_stability_gui_update(stab_data.motions[update_cnt].ypr[0] * 100, stab_data.motions[update_cnt].ypr[1] * 100);
+            Serial.printf("*********Succeed to add one data, x: %f, y: %f *********.\n",
+                          stab_data.motions[update_cnt].ypr[0],
+                          stab_data.motions[update_cnt].ypr[1]);
+            update_cnt++;
+        }
     }
 }
 
@@ -77,6 +82,7 @@ static int firing_stability_exit_callback(void *param)
 {
     firing_stability_gui_del();
     update_cnt = 0;
+    ui_initialed = false;
     return 0;
 }
 
