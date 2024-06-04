@@ -200,7 +200,8 @@ void loop()
     Serial.printf("Bullet Sensor, bullet cnt: %d, loaded: %s, mag exist: %s\n",
                   bullet_sensor.getNum(), bullet_sensor.isLoaded() ? "true" : "false",
                   bullet_sensor.magazineExist() ? "true" : "false");
-
+    
+    //delay(200);
     // mpu.getVirtureMotion6(&tmp_action);
     // Serial.printf("\tax = %d\tay = %d\taz = %d\n", tmp_action.v_ax, tmp_action.v_ay, tmp_action.v_az);
     // Serial.printf("\tax = %f\tay = %f\taz = %f\n", tmp_action.v_ax / 16384.0f * 9.8, tmp_action.v_ay / 16384.0f * 9.8, tmp_action.v_az / 16384.0f * 9.8);
