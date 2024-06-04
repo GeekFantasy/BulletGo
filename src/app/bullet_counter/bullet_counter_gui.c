@@ -103,14 +103,14 @@ void bullet_counter_gui_init()
     lv_anim_init(&anim_shoot);
     lv_anim_set_exec_cb(&anim_shoot, (lv_anim_exec_xcb_t) lv_obj_set_y);
     lv_anim_set_var(&anim_shoot, img_bullet);
-    lv_anim_set_time(&anim_shoot, 350);
+    lv_anim_set_time(&anim_shoot, 300);
     lv_anim_set_values(&anim_shoot, 50, -170);
     lv_anim_set_ready_cb(&anim_shoot, display_not_loaded);
 
     lv_anim_init(&anim_load);
     lv_anim_set_exec_cb(&anim_load, (lv_anim_exec_xcb_t) lv_obj_set_y);
     lv_anim_set_var(&anim_load, img_bullet);
-    lv_anim_set_time(&anim_load, 350);
+    lv_anim_set_time(&anim_load, 300);
     lv_anim_set_values(&anim_load, 220, 50);
     lv_anim_set_ready_cb(&anim_load, display_loaded);
 

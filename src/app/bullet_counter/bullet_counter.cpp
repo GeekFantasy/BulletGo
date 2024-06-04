@@ -6,19 +6,19 @@
 
 #define BULLET_COUNTER_APP_NAME "Bullet Counter"
 #define BULLET_COUNTER_CONFIG_PATH "/bulletcounter.cfg"
-#define TRIGGER_MOTION_RECORD_TIME 400   // 子弹发射后，多长时间开始采集 IMU的数据
+#define TRIGGER_MOTION_RECORD_TIME 400 // 子弹发射后，多长时间开始采集 IMU的数据
 
 static int bullet_cnt = 0;
 static bool is_loaded_prior = false;
 static bool is_loaded = false;
 static bool magazine_exist = false;
-static bool inter_triggered = false;
+static bool inter_triggered = true;
 static uint32_t inter_triggered_time = 0;
 static bool need_record_motion = false;
 static uint32_t motion_trigger_time = 0;
 static uint32_t motion_record_time = 0;
 
-void IRAM_ATTR handle_bulletsensor_inter() 
+void IRAM_ATTR handle_bulletsensor_inter()
 {
     inter_triggered = true;
     inter_triggered_time = xTaskGetTickCount();
@@ -26,46 +26,54 @@ void IRAM_ATTR handle_bulletsensor_inter()
 
 static int bullet_counter_init(AppController *sys)
 {
-    tft->setSwapBytes(true);
+    // tft->setSwapBytes(true);
+    bullet_cnt = 0;
+    is_loaded_prior = false;
+    is_loaded = false;
+    magazine_exist = false;
+    inter_triggered = true;
+    inter_triggered_time = xTaskGetTickCount();
+    need_record_motion = false;
+
     bullet_counter_gui_init();
     bullet_sensor.initInterrupt(handle_bulletsensor_inter);
     return 0;
 }
 
 static void bullet_counter_process(AppController *sys,
-                            const ImuAction *act_info,
-                            int btn_event)
+                                   const ImuAction *act_info,
+                                   int btn_event)
 {
-    if(0 == btn_event) 
+    if (0 == btn_event)
     {
         Serial.printf("Will exit the app. \n");
         sys->app_exit(); // 退出APP
         return;
     }
 
-    //Serial.printf("Display bullet status. \n");
-
-    bullet_cnt = bullet_sensor.getNum();
-    is_loaded = bullet_sensor.isLoaded();
-    magazine_exist = bullet_sensor.magazineExist();
-
-    if(inter_triggered)
+    if (inter_triggered)
     {
-        if(is_loaded_prior && !is_loaded)
+        inter_triggered = false;
+        bullet_cnt = bullet_sensor.getNum();
+        is_loaded = bullet_sensor.isLoaded();
+        magazine_exist = bullet_sensor.magazineExist();
+
+        if (is_loaded_prior && !is_loaded)
         {
             need_record_motion = true;
             motion_trigger_time = inter_triggered_time;
             motion_record_time = inter_triggered_time + TRIGGER_MOTION_RECORD_TIME;
-            Serial.printf("********************Need to record motion at %d**************************. \n", motion_record_time);
         }
-        
-        inter_triggered = false;
+
+        is_loaded_prior = is_loaded;
+        display_bullet_status_v2(bullet_cnt, is_loaded, magazine_exist);
+    }
+    else
+    {
+        delay(25);
     }
 
-    is_loaded_prior = is_loaded;
-    display_bullet_status_v2(bullet_cnt, is_loaded, magazine_exist);
-
-    if(need_record_motion && (xTaskGetTickCount() > motion_record_time))
+    if (need_record_motion && (xTaskGetTickCount() > motion_record_time))
     {
         IMUSensorData data[50];
         FiringStability fs;
@@ -88,9 +96,8 @@ static void bullet_counter_process(AppController *sys,
 }
 
 static void bullet_counter_background_task(AppController *sys,
-                                    const ImuAction *act_info)
+                                           const ImuAction *act_info)
 {
-
 }
 
 static int bullet_counter_exit_callback(void *param)
@@ -101,10 +108,9 @@ static int bullet_counter_exit_callback(void *param)
 }
 
 static void bullet_counter_message_handle(const char *from, const char *to,
-                                   APP_MESSAGE_TYPE type, void *message,
-                                   void *ext_info)
+                                          APP_MESSAGE_TYPE type, void *message,
+                                          void *ext_info)
 {
-   
 }
 
 APP_OBJ bullet_counter_app = {BULLET_COUNTER_APP_NAME, &app_bullet_counter, "",
