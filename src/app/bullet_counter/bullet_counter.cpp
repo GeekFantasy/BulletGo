@@ -83,14 +83,6 @@ static void bullet_counter_process(AppController *sys,
         fire_stab_data.push(fs);
 
         need_record_motion = false;
-        Serial.printf("*************One motion data was recored, trig time: %d. fire_stab_data.size: %d *************\n", motion_trigger_time, fire_stab_data.size());
-
-        Serial.printf("GetLast.trig_time: %d\n", fire_stab_data.getLast().trig_time);
-        for (size_t i = 0; i < fire_stab_data.size(); i++)
-        {
-            Serial.printf("fire_stab_data[%d].trig_time: %d\n", i, fire_stab_data.getIndex(i).trig_time);
-        }
-        
         sys->send_to(BULLET_COUNTER_APP_NAME, CTRL_NAME, APP_MESSAGE_WRITE_DATA, NULL, NULL);
     }
 }

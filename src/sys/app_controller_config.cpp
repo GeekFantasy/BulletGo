@@ -487,25 +487,6 @@ void serializeFiringStability(const FiringStability &data, const char *filename)
         }
     }
 
-    // // 打印JSON文档内容
-    // Serial.println("Serialized JSON document:");
-    // serializeJsonPretty(doc, Serial);
-    // Serial.println();
-
-    // 获取并打印内存占用
-    size_t usedMemory = doc.memoryUsage();
-    Serial.print("Memory Usage for Serialization: ");
-    Serial.print(usedMemory);
-    Serial.println(" bytes");
-
-    // 获取并打印JSON文档长度
-    size_t jsonLength = measureJson(doc);
-    Serial.print("JSON Document Length: ");
-    Serial.print(jsonLength);
-    Serial.println(" bytes");
-
-    Serial.printf("The trigger time of the data is %d .\n", data.trig_time);
-
     // 打开文件以进行写操作
     File file = SPIFFS.open(filename, FILE_WRITE);
     if (!file)
@@ -530,8 +511,6 @@ bool deserializeFiringStability(FiringStability &data, const char *filename)
         return false;
     }
 
-    Serial.printf("The size of %s is %d. \n", filename, file.size());
-
     // 创建一个JSON文档
     DynamicJsonDocument doc(6000); // 动态分配内存以适应文档大小
     DeserializationError error = deserializeJson(doc, file);
@@ -542,22 +521,9 @@ bool deserializeFiringStability(FiringStability &data, const char *filename)
         return false;
     }
 
-    // // 打印反序列化后的JSON文档内容
-    // Serial.println("Deserialized JSON document:");
-    // serializeJsonPretty(doc, Serial);
-    // Serial.println();
-
-    // 获取并打印内存占用
-    size_t usedMemory = doc.memoryUsage();
-    Serial.print("Memory Usage for Deserialization: ");
-    Serial.print(usedMemory);
-    Serial.println(" bytes");
-
-
     // 反序列化对象
     JsonObject obj = doc.as<JsonObject>();
     data.trig_time = obj["trig_time"];
-    Serial.printf("Trigger time of the data is %d. \n", data.trig_time);
 
     JsonArray motionsArray = obj["motions"];
     size_t j = 0;
@@ -573,7 +539,6 @@ bool deserializeFiringStability(FiringStability &data, const char *filename)
     }
 
     file.close();
-    Serial.printf("Suceed to deserial obj from %s. \n", filename);
     return true;
 }
 
