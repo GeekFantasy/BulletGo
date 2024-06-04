@@ -65,7 +65,7 @@ public:
     void write_config(SysMpuConfig *cfg);
     void read_config(RgbConfig *cfg);
     void write_config(RgbConfig *cfg);
-    void write_data(const FixedQueue<FiringStability, 5> &fs_data);
+    void write_data(const FixedQueue<FiringStability, FIRING_STAB_DATA_SIZE> &fs_data);
     void read_data(FixedQueue<FiringStability, 5> &fs_data);
 
 private:

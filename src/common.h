@@ -42,7 +42,7 @@ extern Network g_network;  // 网络连接
 extern FlashFS g_flashCfg; // flash中的文件系统（替代原先的Preferences）
 extern Display screen;     // 屏幕对象
 extern FixedQueue<IMUSensorData, 50> imu_data; //用于存储连续获取的 IMU Sensor Data，供其它任务使用
-extern FixedQueue<FiringStability, 5> fire_stab_data; 
+extern FixedQueue<FiringStability, FIRING_STAB_DATA_SIZE> fire_stab_data; 
 
 boolean doDelayMillisTime(unsigned long interval,
                           unsigned long *previousMillis,

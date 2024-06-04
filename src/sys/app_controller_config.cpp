@@ -504,6 +504,8 @@ void serializeFiringStability(const FiringStability &data, const char *filename)
     Serial.print(jsonLength);
     Serial.println(" bytes");
 
+    Serial.printf("The trigger time of the data is %d .\n", data.trig_time);
+
     // 打开文件以进行写操作
     File file = SPIFFS.open(filename, FILE_WRITE);
     if (!file)
@@ -555,6 +557,7 @@ bool deserializeFiringStability(FiringStability &data, const char *filename)
     // 反序列化对象
     JsonObject obj = doc.as<JsonObject>();
     data.trig_time = obj["trig_time"];
+    Serial.printf("Trigger time of the data is %d. \n", data.trig_time);
 
     JsonArray motionsArray = obj["motions"];
     size_t j = 0;
@@ -574,7 +577,7 @@ bool deserializeFiringStability(FiringStability &data, const char *filename)
     return true;
 }
 
-void AppController::write_data(const FixedQueue<FiringStability, 5> &fs_data)
+void AppController::write_data(const FixedQueue<FiringStability, FIRING_STAB_DATA_SIZE> &fs_data)
 {
     int size = fs_data.size();
 
@@ -586,7 +589,7 @@ void AppController::write_data(const FixedQueue<FiringStability, 5> &fs_data)
     }
 }
 
-void AppController::read_data(FixedQueue<FiringStability, 5> &fs_data)
+void AppController::read_data(FixedQueue<FiringStability, FIRING_STAB_DATA_SIZE> &fs_data)
 {
     for (size_t i = 0; i < FIRING_STAB_DATA_SIZE; i++)
     {

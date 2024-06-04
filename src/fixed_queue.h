@@ -126,9 +126,9 @@ public:
     {
        if (xSemaphoreTake(mutex, portMAX_DELAY) == pdTRUE)
         {
-            if (index < numElements)
+            if (index < numElements && numElements > 0)
             {
-                size_t index = (head + index) % N;
+                index = (head + index) % N;
                 
                 xSemaphoreGive(mutex);
                 return arr[index];
