@@ -9,7 +9,10 @@
 		"files.associations": {
 			"bullet_counter_gui.h": "c",
 			"lvgl.h": "c",
-			"bullet_sensor.h": "c"
+			"bullet_sensor.h": "c",
+			"firing_stability_gui.h": "c",
+			"firing_stability.h": "c",
+			"stability_data.h": "c"
 		}
 	}
 }

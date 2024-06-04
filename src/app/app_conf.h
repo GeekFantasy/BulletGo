@@ -104,4 +104,10 @@
 #include "app/motion_state_server/motion_state_server.h"
 #endif
 
+// 设计稳定性检测
+#define APP_FIRING_STABILIT_USE 1
+#if APP_FIRING_STABILIT_USE
+#include "app/firing_stability/firing_stability.h"
+#endif
+
 #endif

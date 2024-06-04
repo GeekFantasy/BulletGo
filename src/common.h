@@ -15,6 +15,7 @@
 #include "driver/button.h"
 #include "network.h"
 #include "fixed_queue.h"
+#include "stability_data.h"
 
 // RGB
 #define RGB_LED_PIN 27
@@ -29,6 +30,8 @@
 #define IMU_I2C_SDA 32
 #define IMU_I2C_SCL 33
 
+#define FIRING_STAB_DATA_SIZE 5
+
 extern IMU mpu; // 原则上只提供给主程序调用
 extern BulletSensor bullet_sensor;
 extern Button button;
@@ -39,6 +42,7 @@ extern Network g_network;  // 网络连接
 extern FlashFS g_flashCfg; // flash中的文件系统（替代原先的Preferences）
 extern Display screen;     // 屏幕对象
 extern FixedQueue<IMUSensorData, 50> imu_data; //用于存储连续获取的 IMU Sensor Data，供其它任务使用
+extern FixedQueue<FiringStability, FIRING_STAB_DATA_SIZE> fire_stab_data; 
 
 boolean doDelayMillisTime(unsigned long interval,
                           unsigned long *previousMillis,
@@ -63,7 +67,8 @@ boolean doDelayMillisTime(unsigned long interval,
 #define CONFIG_POWER_EN_PIN 21
 #define CONFIG_ENCODER_PUSH_PIN 27
 #else
-#define LCD_BL_PIN 22
+//#define LCD_BL_PIN 22   // veriosn  2.1
+#define LCD_BL_PIN 5    // version 1.0
 #endif
 
 #define LCD_BL_PWM_CHANNEL 0

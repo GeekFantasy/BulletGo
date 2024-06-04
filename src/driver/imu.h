@@ -75,7 +75,8 @@ private:
     uint8_t order; // 表示方位，x与y是否对换
 
     float ypr[3]; // [yaw, pitch, roll]   yaw/pitch/roll container and gravity vector
-    float acc[3]; // [acc_x, acc_y, acc_z]
+    int16_t acc_i16[3]; // accel original data [acc_x, acc_y, acc_z]
+    float acc[3]; // accel data [acc_x, acc_y, acc_z]
     int16_t temperature;
     bool dmpReady = false; // set true if DMP init was successful
 

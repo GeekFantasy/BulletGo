@@ -304,15 +304,23 @@ ImuAction *IMU::getAction(void)
 
 void IMU::getVirtureMotion6(ImuAction *action_info)
 {
-    if (xSemaphoreTake(mutex, portMAX_DELAY) == pdTRUE)
-    {
-        mpu.getMotion6(&(action_info->v_ax), &(action_info->v_ay),
-                       &(action_info->v_az), &(action_info->v_gx),
-                       &(action_info->v_gy), &(action_info->v_gz));
+    // if (xSemaphoreTake(mutex, portMAX_DELAY) == pdTRUE)
+    // {
+    //     mpu.getMotion6(&(action_info->v_ax), &(action_info->v_ay),
+    //                    &(action_info->v_az), &(action_info->v_gx),
+    //                    &(action_info->v_gy), &(action_info->v_gz));
 
-        xSemaphoreGive(mutex);
-    }
-    
+    //     xSemaphoreGive(mutex);
+    // }
+
+    // The condition of use this is that call updateYPR periodically. Or the data is legacy.
+    action_info->v_ax = acc_i16[0] * 2; // The data from DMP is half of the normal value, so multiple 2 for workaround
+    action_info->v_ay = acc_i16[1] * 2;
+    action_info->v_az = acc_i16[2] * 2;
+    action_info->v_gx = 0;
+    action_info->v_gy = 0;
+    action_info->v_gz = 0;
+
     if (order & X_DIR_TYPE)
     {
         action_info->v_ax = -action_info->v_ax;
@@ -351,7 +359,6 @@ void IMU::updateYPR()
 
     // MPU control/status vars
     uint8_t fifoBuffer[64]; // FIFO storage buffer
-    int16_t acc_i16[3];
 
     // if programming failed, don't try to do anything
     if (!dmpReady)
@@ -415,9 +422,10 @@ IMUSensorData IMU::getSensorData()
     sensorData.ypr[1] = ypr[1] * 180 / M_PI;
     sensorData.ypr[2] = ypr[2] * 180 / M_PI;
 
-    sensorData.acc[0] = acc[0];
-    sensorData.acc[1] = acc[1];
-    sensorData.acc[2] = acc[2];
+    // The accel data from DMP is half of the normal value, so multipling 2 for a workaround
+    sensorData.acc[0] = acc[0] * 2;  
+    sensorData.acc[1] = acc[1] * 2;
+    sensorData.acc[2] = acc[2] * 2;
 
     return sensorData;
 }

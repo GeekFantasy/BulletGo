@@ -10,7 +10,6 @@
 
 #include "common.h"
 #include "sys/app_controller.h"
-
 #include "app/app_conf.h"
 
 #include <SPIFFS.h>
@@ -67,9 +66,9 @@ void imu_sensor_data_task(void *parameter)
 
         if (i >= 10)
         {
-            Serial.printf("SD->t:%d,y:%.2f,p:%.2f,r:%.2f,ax:%.2f,ay:%.2f,az:%.2f.\n",
-                          data.tick, data.ypr[0], data.ypr[1], data.ypr[2],
-                          data.acc[0], data.acc[1], data.acc[2]);
+            // Serial.printf("SD->t:%d,y:%.2f,p:%.2f,r:%.2f,ax:%.2f,ay:%.2f,az:%.2f.\n",
+            //               data.tick, data.ypr[0], data.ypr[1], data.ypr[2],
+            //               data.acc[0], data.acc[1], data.acc[2]);
             i = 0;
         }
         i++;
@@ -77,6 +76,7 @@ void imu_sensor_data_task(void *parameter)
         vTaskDelayUntil(&last_wake_time, frequency);
     }
 }
+
 
 void setup()
 {
@@ -105,6 +105,7 @@ void setup()
     app_controller->read_config(&app_controller->sys_cfg);
     app_controller->read_config(&app_controller->mpu_cfg);
     app_controller->read_config(&app_controller->rgb_cfg);
+    app_controller->read_data(fire_stab_data);
 
     /*** Init screen ***/
     app_controller->sys_cfg.rotation = 0; // Force the rotaion to 2
@@ -125,6 +126,10 @@ void setup()
     // 将APP"安装"到controller里
 #if APP_BULLET_COUNTER_USE
     app_controller->app_install(&bullet_counter_app);
+#endif
+
+#if APP_FIRING_STABILIT_USE
+    app_controller->app_install(&firing_stability_app);
 #endif
 
 #if APP_STABILITY_TRAINING_USE
@@ -170,9 +175,7 @@ void setup()
     act_info = mpu.getAction();
 
     // 定义一个mpu6050的动作检测定时器
-    xTimerAction = xTimerCreate("Action Check",
-                                200 / portTICK_PERIOD_MS,
-                                pdTRUE, (void *)0, actionCheckHandle);
+    xTimerAction = xTimerCreate("Action Check", 200 / portTICK_PERIOD_MS, pdTRUE, (void *)0, actionCheckHandle);
     xTimerStart(xTimerAction, 0);
 
     xTaskCreate(imu_sensor_data_task, "SensorDataTask", 4096, NULL, 1, NULL);
@@ -192,12 +195,13 @@ void loop()
 
     Serial.printf("Time: %d \n", GET_SYS_MILLIS());
     // Read button state
-    // Serial.printf("Button State: %d, Event: %d \n", button.getState(), btn_event);
+    Serial.printf("Button State: %d, Event: %d \n", button.getState(), btn_event);
 
     // Serial.printf("Bullet Sensor, bullet cnt: %d, loaded: %s, mag exist: %s\n",
     //               bullet_sensor.getNum(), bullet_sensor.isLoaded() ? "true" : "false",
     //               bullet_sensor.magazineExist() ? "true" : "false");
-
+    
+    //delay(200);
     // mpu.getVirtureMotion6(&tmp_action);
     // Serial.printf("\tax = %d\tay = %d\taz = %d\n", tmp_action.v_ax, tmp_action.v_ay, tmp_action.v_az);
     // Serial.printf("\tax = %f\tay = %f\taz = %f\n", tmp_action.v_ax / 16384.0f * 9.8, tmp_action.v_ay / 16384.0f * 9.8, tmp_action.v_az / 16384.0f * 9.8);

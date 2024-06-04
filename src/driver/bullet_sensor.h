@@ -14,7 +14,6 @@
 #define BULLET_SENSOR_LAST_BULLET_BIT       6
 #define BULLET_SENSOR_TRIGER_BIT            7
 
-
 class BulletSensor
 {
     private:
@@ -24,6 +23,8 @@ class BulletSensor
 
     public:
     void init();
+    void initInterrupt(void (*isr)());
+    void cancelInterrupt();
     int getNum();
     bool magazineExist();
     bool isLoaded();
