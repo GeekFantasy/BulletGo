@@ -1,8 +1,8 @@
 #include "sys_loading.h"
 
 // 定义动画时长（单位：毫秒）
-#define PROGRESS_ANIM_DURATION 2600
-#define TEXT_ANIM_DURATION 600
+#define PROGRESS_ANIM_DURATION 2500
+#define TEXT_ANIM_DURATION 400
 #define SCREEN_FADE_IN_DURATION 800
 
 lv_obj_t *progress_bar;
