@@ -17,6 +17,7 @@
 #include <esp32-hal-timer.h>
 
 static bool isCheckAction = false;
+static bool is_sys_loading = true;
 
 /*** Component objects **7*/
 ImuAction *act_info;  // 存放mpu6050返回的数据
@@ -77,6 +78,10 @@ void imu_sensor_data_task(void *parameter)
     }
 }
 
+void loading_ready_callback()
+{
+    is_sys_loading = false;
+};
 
 void setup()
 {
@@ -113,13 +118,27 @@ void setup()
                 app_controller->sys_cfg.backLight);
 
     /*** Init micro SD-Card ***/
-    tf.init();
+    //tf.init();
 
     lv_fs_fatfs_init();
 
 #if LV_USE_LOG
     lv_log_register_print_cb(my_print);
 #endif /*LV_USE_LOG*/
+
+    // 显示开机动画
+    start_loading_animation(loading_ready_callback);
+    do
+    {
+        lv_timer_handler();
+        delay(20);
+    } while (is_sys_loading);
+    
+    for (size_t i = 0; i < 25; i++)
+    {
+        lv_timer_handler();
+        delay(60);
+    }
 
     app_controller->init();
 
@@ -200,16 +219,16 @@ void loop()
     // Serial.printf("Bullet Sensor, bullet cnt: %d, loaded: %s, mag exist: %s\n",
     //               bullet_sensor.getNum(), bullet_sensor.isLoaded() ? "true" : "false",
     //               bullet_sensor.magazineExist() ? "true" : "false");
-    
-    //delay(200);
-    // mpu.getVirtureMotion6(&tmp_action);
-    // Serial.printf("\tax = %d\tay = %d\taz = %d\n", tmp_action.v_ax, tmp_action.v_ay, tmp_action.v_az);
-    // Serial.printf("\tax = %f\tay = %f\taz = %f\n", tmp_action.v_ax / 16384.0f * 9.8, tmp_action.v_ay / 16384.0f * 9.8, tmp_action.v_az / 16384.0f * 9.8);
-    // mpu.updateYPR();
-    // Serial.print("YPR:\t");
-    // Serial.print(mpu.getYaw());
-    // Serial.print("\t");
-    // Serial.print(mpu.getPitch());
-    // Serial.print("\t");
-    // Serial.println(mpu.getRoll());
+
+    // delay(200);
+    //  mpu.getVirtureMotion6(&tmp_action);
+    //  Serial.printf("\tax = %d\tay = %d\taz = %d\n", tmp_action.v_ax, tmp_action.v_ay, tmp_action.v_az);
+    //  Serial.printf("\tax = %f\tay = %f\taz = %f\n", tmp_action.v_ax / 16384.0f * 9.8, tmp_action.v_ay / 16384.0f * 9.8, tmp_action.v_az / 16384.0f * 9.8);
+    //  mpu.updateYPR();
+    //  Serial.print("YPR:\t");
+    //  Serial.print(mpu.getYaw());
+    //  Serial.print("\t");
+    //  Serial.print(mpu.getPitch());
+    //  Serial.print("\t");
+    //  Serial.println(mpu.getRoll());
 }

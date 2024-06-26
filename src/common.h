@@ -16,6 +16,7 @@
 #include "network.h"
 #include "fixed_queue.h"
 #include "stability_data.h"
+#include "sys/sys_loading.h"
 
 // RGB
 #define RGB_LED_PIN 27
