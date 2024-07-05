@@ -51,27 +51,19 @@ static void bullet_counter_process(AppController *sys,
         return;
     }
 
-    if (inter_triggered)
-    {
-        inter_triggered = false;
-        bullet_cnt = bullet_sensor.getNum();
-        is_loaded = bullet_sensor.isLoaded();
-        magazine_exist = bullet_sensor.magazineExist();
+    bullet_cnt = bullet_sensor.getNum();
+    is_loaded = bullet_sensor.isLoaded();
+    magazine_exist = bullet_sensor.magazineExist();
 
-        if (is_loaded_prior && !is_loaded)
-        {
-            need_record_motion = true;
-            motion_trigger_time = inter_triggered_time;
-            motion_record_time = inter_triggered_time + TRIGGER_MOTION_RECORD_TIME;
-        }
-
-        is_loaded_prior = is_loaded;
-        display_bullet_status_v2(bullet_cnt, is_loaded, magazine_exist);
-    }
-    else
+    if (is_loaded_prior && !is_loaded)
     {
-        delay(25);
+        need_record_motion = true;
+        motion_trigger_time = inter_triggered_time;
+        motion_record_time = inter_triggered_time + TRIGGER_MOTION_RECORD_TIME;
     }
+
+    is_loaded_prior = is_loaded;
+    display_bullet_status_v2(bullet_cnt, is_loaded, magazine_exist);
 
     if (need_record_motion && (xTaskGetTickCount() > motion_record_time))
     {
