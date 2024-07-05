@@ -216,9 +216,9 @@ void loop()
     // Read button state
     Serial.printf("Button State: %d, Event: %d \n", button.getState(), btn_event);
 
-    Serial.printf("Bullet Sensor, bullet cnt: %d, loaded: %s, mag exist: %s\n",
-                  bullet_sensor.getNum(), bullet_sensor.isLoaded() ? "true" : "false",
-                  bullet_sensor.magazineExist() ? "true" : "false");
+    // Serial.printf("Bullet Sensor, bullet cnt: %d, loaded: %s, mag exist: %s\n",
+    //               bullet_sensor.getNum(), bullet_sensor.isLoaded() ? "true" : "false",
+    //               bullet_sensor.magazineExist() ? "true" : "false");
 
     // delay(200);
     //  mpu.getVirtureMotion6(&tmp_action);

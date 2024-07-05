@@ -95,7 +95,7 @@ void firing_stability_gui_init_v2(lv_obj_t **screen, lv_scr_load_anim_t anim_typ
     lv_obj_t *v_label = lv_label_create((*screen));
     lv_label_set_text(v_label, "V");
     lv_obj_set_style_text_font(v_label, &lv_font_montserrat_24, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_text_color(v_label, lv_color_hex(0xFF0000), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_color(v_label, lv_color_hex(0x0000FF), LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_align(v_label, LV_ALIGN_BOTTOM_LEFT, 10, -10); 
 
     lv_obj_t *colon_label = lv_label_create((*screen));
@@ -107,7 +107,7 @@ void firing_stability_gui_init_v2(lv_obj_t **screen, lv_scr_load_anim_t anim_typ
     lv_obj_t *h_label = lv_label_create((*screen));
     lv_label_set_text(h_label, "H");
     lv_obj_set_style_text_font(h_label, &lv_font_montserrat_24, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_text_color(h_label, lv_color_hex(0x0000FF), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_color(h_label, lv_color_hex(0xFF0000), LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_align(h_label, LV_ALIGN_BOTTOM_LEFT, 46, -10);
 
     char score_str[12];
