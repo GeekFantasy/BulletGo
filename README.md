@@ -10,18 +10,18 @@ https://www.bilibili.com/video/BV1oKWseEEC7
 ### 功能包含：
 载弹量检测，上膛和击发检测，射击稳定性检测，持枪稳定性训练，运动状态监测 等。
 
-![image](指示21.png)
+![image](bullet_counter_intro.png)
 ![image](4bullets.png)
 
 ### 应用切换
-![image](应用切换6.gif)
+![image](app_swipe.gif)
 
 ### 弹量显示
-![image](弹量-1.gif)
+![image](bullet_counter.gif)
 
 ### 持枪稳定性训练
-![image](持枪训练.gif)
+![image](stability_training.gif)
 
 ### 射击稳定性检测
-![image](射击稳定性检测666.gif)
+![image](stability_check.gif)
 
