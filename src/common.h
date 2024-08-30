@@ -16,6 +16,7 @@
 #include "network.h"
 #include "fixed_queue.h"
 #include "stability_data.h"
+#include "sys/sys_loading.h"
 
 // RGB
 #define RGB_LED_PIN 27
@@ -67,8 +68,8 @@ boolean doDelayMillisTime(unsigned long interval,
 #define CONFIG_POWER_EN_PIN 21
 #define CONFIG_ENCODER_PUSH_PIN 27
 #else
-//#define LCD_BL_PIN 22   // veriosn  2.1
-#define LCD_BL_PIN 5    // version 1.0
+#define LCD_BL_PIN 22   // veriosn  2.1
+//#define LCD_BL_PIN 5    // version 1.0
 #endif
 
 #define LCD_BL_PWM_CHANNEL 0

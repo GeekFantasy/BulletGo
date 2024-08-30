@@ -36,7 +36,7 @@ static void motion_server_process(AppController *sys,
                            const ImuAction *action,
                            int btn_event)
 {
-    if (0 == btn_event)
+    if (ButtonEvent::BTN_DOWN == btn_event)
     {
         run_data->web_start = 0;
         run_data->req_sent = 0;
@@ -54,8 +54,10 @@ static void motion_server_process(AppController *sys,
             "Wait...", "Wait...",
             LV_SCR_LOAD_ANIM_NONE);
         // 如果web服务没有开启 且 ap开启的请求没有发送 message这边没有作用（填0）
-        sys->send_to(MOTION_STATE_SERVER_APP_NAME, CTRL_NAME,
-                     APP_MESSAGE_WIFI_CONN, NULL, NULL);
+        // sys->send_to(MOTION_STATE_SERVER_APP_NAME, CTRL_NAME,
+        //              APP_MESSAGE_WIFI_CONN, NULL, NULL);
+         sys->send_to(MOTION_STATE_SERVER_APP_NAME, CTRL_NAME,
+                     APP_MESSAGE_WIFI_AP, NULL, NULL);
 
         run_data->req_sent = 1; // 标志为 ap开启请求已发送
     }

@@ -9,9 +9,11 @@
 #define TRIGGER_MOTION_RECORD_TIME 400 // 子弹发射后，多长时间开始采集 IMU的数据
 
 static int bullet_cnt = 0;
+static int bullet_cnt_prior = 0;
 static bool is_loaded_prior = false;
 static bool is_loaded = false;
 static bool magazine_exist = false;
+static bool magazine_exist_prior = false;
 static bool inter_triggered = true;
 static uint32_t inter_triggered_time = 0;
 static bool need_record_motion = false;
@@ -44,28 +46,31 @@ static void bullet_counter_process(AppController *sys,
                                    const ImuAction *act_info,
                                    int btn_event)
 {
-    if (0 == btn_event)
+    if (ButtonEvent::BTN_DOWN == btn_event)
     {
         Serial.printf("Will exit the app. \n");
         sys->app_exit(); // 退出APP
         return;
     }
 
-    if (inter_triggered)
-    {
-        inter_triggered = false;
-        bullet_cnt = bullet_sensor.getNum();
-        is_loaded = bullet_sensor.isLoaded();
-        magazine_exist = bullet_sensor.magazineExist();
+    bullet_cnt = bullet_sensor.getNum();
+    is_loaded = bullet_sensor.isLoaded();
+    magazine_exist = bullet_sensor.magazineExist();
 
+    if (bullet_cnt != bullet_cnt_prior ||
+        is_loaded != is_loaded_prior ||
+        magazine_exist != magazine_exist_prior)
+    {
         if (is_loaded_prior && !is_loaded)
         {
             need_record_motion = true;
-            motion_trigger_time = inter_triggered_time;
-            motion_record_time = inter_triggered_time + TRIGGER_MOTION_RECORD_TIME;
+            motion_trigger_time = xTaskGetTickCount();
+            motion_record_time = motion_trigger_time + TRIGGER_MOTION_RECORD_TIME;
         }
 
+        bullet_cnt_prior = bullet_cnt;
         is_loaded_prior = is_loaded;
+        magazine_exist_prior = magazine_exist;
         display_bullet_status_v2(bullet_cnt, is_loaded, magazine_exist);
     }
     else
@@ -73,8 +78,9 @@ static void bullet_counter_process(AppController *sys,
         delay(25);
     }
 
-    if (need_record_motion && (xTaskGetTickCount() > motion_record_time))
+    if (need_record_motion && (xTaskGetTickCount() >= motion_record_time))
     {
+        //Serial.printf("*****Current time: %d, motion record time: %d, trigger time: %d \n", xTaskGetTickCount(), motion_record_time, motion_trigger_time );
         IMUSensorData data[50];
         FiringStability fs;
 

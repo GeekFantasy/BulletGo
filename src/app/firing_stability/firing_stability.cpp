@@ -36,6 +36,21 @@ static void get_average_data(FiringStability &sd, int16_t *aver_x, int16_t *aver
     *aver_y = sum_y / 50;
 }
 
+static float get_standard_deviation(FiringStability &sd, float aver_x, float aver_y)
+{
+    int i = 0;
+    float variance_x = 0;
+    float variance_y = 0;
+
+    for (i = 0; i < 50; i++)
+    {
+        variance_x += (sd.motions[i].ypr[0] - aver_x) * (sd.motions[i].ypr[0] - aver_x);
+        variance_y += (sd.motions[i].ypr[1] - aver_y) * (sd.motions[i].ypr[1] - aver_y);
+    }
+
+    return  sqrt(variance_x / 50) + sqrt(variance_y / 50);
+}
+
 static int firing_stability_init(AppController *sys)
 {
     num_of_data = fire_stab_data.size();
@@ -70,7 +85,7 @@ static void firing_stability_process(AppController *sys,
                                      const ImuAction *act_info,
                                      int btn_event)
 {
-    if (0 == btn_event)
+    if (ButtonEvent::BTN_DOWN == btn_event)
     {
         Serial.printf("Exit stability training app. \n");
         sys->app_exit(); // 退出APP
@@ -96,19 +111,22 @@ static void firing_stability_process(AppController *sys,
         cur_data_idx = (cur_data_idx + num_of_data) % num_of_data;
         anim_type = LV_SCR_LOAD_ANIM_MOVE_RIGHT;
     }
-    Serial.printf("******Current data index is %d. ******\n", cur_data_idx);
+    Serial.printf("Current index %d.\n", cur_data_idx);
 
     if(NULL == screens[cur_data_idx])
     {
         // Init the screen and fill in data 
-        int16_t aver_x = 0, aver_y = 0;
+        float std_deviation = 0.0;
+        int16_t aver_x = 0, aver_y = 0, score = 0;
         FiringStability stab_data = fire_stab_data.getIndex(num_of_data - cur_data_idx - 1); // The last one shows first
         get_average_data(stab_data, &aver_x, &aver_y);
-        Serial.printf("******Average x: %d, average y: %d. ******\n", aver_x, aver_y);
+        std_deviation = get_standard_deviation(stab_data, aver_x/100.0, aver_y/100.0);
+        score = 100 - 50 * std_deviation;
+        Serial.printf("Average x: %d, average y: %d, std_dev: %f\n", aver_x, aver_y, std_deviation);
 
-        firing_stability_gui_init_v2(&screens[cur_data_idx], anim_type, stab_data, aver_x, aver_y, (cur_data_idx + 1), (100 - cur_data_idx));
+        firing_stability_gui_init_v2(&screens[cur_data_idx], anim_type, stab_data, aver_x, aver_y, (cur_data_idx + 1), score > 0 ? score : 0);
         not_respond_time = xTaskGetTickCount() + ANIMATION_TIME;
-        Serial.printf("******The trigger time of the current data: %d. ******\n", stab_data.trig_time);
+        Serial.printf("The trigger time of the current data: %d.\n", stab_data.trig_time);
     }
     else
     {
@@ -122,7 +140,7 @@ static void firing_stability_process(AppController *sys,
             delay(40);
         }
         
-        Serial.printf("******Need to delay for screen load animation. ******\n");
+        //Serial.printf("******Need to delay for screen load animation. ******\n");
     }
     
     // if (ui_initialed)

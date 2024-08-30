@@ -34,7 +34,7 @@ static void stability_training_process(AppController *sys,
                                        const ImuAction *act_info,
                                        int btn_event)
 {
-    if (0 == btn_event)
+    if (ButtonEvent::BTN_DOWN == btn_event)
     {
         Serial.printf("Exit stability training app. \n");
         sys->app_exit(); // 退出APP
